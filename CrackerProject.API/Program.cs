@@ -1,7 +1,12 @@
+using CrackerProject.API.Context;
+using CrackerProject.API.Interfaces;
+using CrackerProject.API.Persistence;
+using CrackerProject.API.Repository;
 using CrackerProject.API.Services;
 using CrackerProject.API.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.GenericRepository.UoW;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +21,14 @@ builder.Services.AddSingleton<IMongoClient>(
     s => new MongoClient(mongodbSettings.ConnectionString));
 
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IMongoContext, MongoContext>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 
 builder.Services.AddControllers();
+
+MongoDbPersistence.Configure();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

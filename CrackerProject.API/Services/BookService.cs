@@ -43,7 +43,7 @@ namespace CrackerProject.API.Services
 
             _books.InsertOne(book);
 
-            var savedbook = _books.Find(book.Id);
+            var savedbook = _books.Find(book.Id.ToString());
 
             if(savedbook == null)
             {

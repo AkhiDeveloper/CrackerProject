@@ -7,8 +7,7 @@ namespace CrackerProject.API.Models
     public class Book
     {
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = String.Empty;
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [BsonElement("description")]
         public string Description { get; set; } = String.Empty;
