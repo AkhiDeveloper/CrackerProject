@@ -11,5 +11,6 @@ namespace CrackerProject.API.Interfaces
         Task<IEnumerable<TEntity>> GetAll();
         void Update(TEntity obj);
         void Remove(Guid id);
+        Task<IList<TEntity>> Find<U>(string fieldname, U fieldvalue);
     }
 }

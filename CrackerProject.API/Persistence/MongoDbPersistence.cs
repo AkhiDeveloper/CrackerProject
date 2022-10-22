@@ -7,8 +7,8 @@ namespace CrackerProject.API.Persistence
     {
         public static void Configure()
         {
-            ProductMap.Configure();
             BookMap.Configure();
+            BookSectionMap.Configure();
 
             BsonDefaults.GuidRepresentation = GuidRepresentation.CSharpLegacy;
             //BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.CSharpLegacy));

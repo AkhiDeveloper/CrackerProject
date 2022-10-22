@@ -1,9 +1,12 @@
 ﻿using MongoDB.Driver;
+using MongoDB.Bson;
+using MongoDB.Driver.Linq;
 using CrackerProject.API.Interfaces;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Humanizer;
 
 namespace CrackerProject.API.Repository
 {
@@ -16,7 +19,7 @@ namespace CrackerProject.API.Repository
         {
             Context = context;
 
-            DbSet = Context.GetCollection<TEntity>(typeof(TEntity).Name);
+            DbSet = Context.GetCollection<TEntity>(typeof(TEntity).Name.Pluralize());
         }
 
         public virtual void Add(TEntity obj)
@@ -44,6 +47,12 @@ namespace CrackerProject.API.Repository
         public virtual void Remove(Guid id)
         {
             Context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", id)));
+        }
+
+        public virtual async Task<IList<TEntity>> Find<U>(string fieldname, U fieldvalue)
+        {
+            var result = await DbSet.FindAsync(Builders<TEntity>.Filter.Eq(fieldname,fieldvalue));
+            return await result.ToListAsync();
         }
 
         public void Dispose()

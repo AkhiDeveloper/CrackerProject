@@ -23,9 +23,11 @@ builder.Services.AddSingleton<IMongoClient>(
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IMongoContext, MongoContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookSectionRepository, BookSectionRepository>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
 

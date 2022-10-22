@@ -23,14 +23,10 @@ namespace CrackerProject.API.Models
         public string Publisher { get; set; } =string.Empty;
 
         [BsonElement("writer")]
-        public string writer { get; set; } = string.Empty;
+        public string author { get; set; } = string.Empty;
 
         [BsonElement("edition")]
+        [BsonDefaultValue(1)]
         public int Edition { get; set; }
-
-        [BsonElement("sections")]
-        public IEnumerable<BookSection> Sections { get; set; }
-
-
     }
 }

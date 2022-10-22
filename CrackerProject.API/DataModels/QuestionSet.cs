@@ -5,6 +5,7 @@ namespace CrackerProject.API.Models
     public class QuestionSet
     {
         [BsonElement("sn")]
+        [BsonRequired]
         public int SN { get; set; }
 
         [BsonElement("description")]
@@ -13,7 +14,7 @@ namespace CrackerProject.API.Models
         [BsonElement("added_date")]
         public DateTime AddedDate { get; set; }
 
-        [BsonElement("question_ids")]
-        public IEnumerable<string> QuestionIds { get; set; }
+        [BsonElement("questions")]
+        public Question[] questions { get; set; }
     }
 }

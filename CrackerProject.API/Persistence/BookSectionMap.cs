@@ -1,18 +1,18 @@
-﻿using MongoDB.Bson.Serialization;
-using CrackerProject.API.Model;
+﻿using CrackerProject.API.Models;
+using MongoDB.Bson.Serialization;
 
 namespace CrackerProject.API.Persistence
 {
-    public class ProductMap
+    public class BookSectionMap
     {
         public static void Configure()
         {
-            BsonClassMap.RegisterClassMap<Product>(map =>
+            BsonClassMap.RegisterClassMap<BookSection>(map =>
             {
                 map.AutoMap();
                 map.SetIgnoreExtraElements(true);
                 map.MapIdMember(x => x.Id);
-                map.MapMember(x => x.Description).SetIsRequired(true);
+                map.MapMember(x => x.Name).SetIsRequired(true);
             });
         }
     }
