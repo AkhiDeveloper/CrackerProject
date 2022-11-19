@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace CrackerProject.API.ViewModel
 {
-    public class BookSectionCreationForm
+    public class SectionCreationForm
     {
         public int Sn { get; set; } = 1;
 

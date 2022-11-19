@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Humanizer;
+using System.Linq.Expressions;
 
 namespace CrackerProject.API.Repository
 {
@@ -58,6 +59,20 @@ namespace CrackerProject.API.Repository
         public void Dispose()
         {
             Context?.Dispose();
+        }
+
+        public virtual async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> expression)
+        {
+            var result = await DbSet.FindAsync(expression);
+            return await result.ToListAsync();
+        }
+
+        public async Task<bool> IsExist(Guid id)
+        {
+            var cursor = await DbSet.FindAsync<TEntity>(Builders<TEntity>.Filter.Eq("_id", id));
+            var result = await cursor.ToListAsync();
+            if(result.Count < 1) return false;
+            return true;
         }
     }
 }

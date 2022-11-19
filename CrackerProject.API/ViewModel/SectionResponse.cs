@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace CrackerProject.API.ViewModel
 {
-    public class BookSectionResponse
+    public class SectionResponse
     {
         [BsonId]
         public Guid Id { get; set; } = Guid.Empty;

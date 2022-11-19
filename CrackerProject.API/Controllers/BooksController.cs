@@ -150,6 +150,14 @@ namespace CrackerProject.API.Controllers
             }
 
             _bookRepository.Remove(id);
+
+            var booksections = await _booksectionRepository.Find(x => x.BookId == id);
+
+            foreach(var section in booksections)
+            {
+                _booksectionRepository.Remove(section.Id);
+            }
+            
             var iscompleted = await _unitOfWork.Commit();
 
             if(iscompleted == false)
@@ -168,8 +176,8 @@ namespace CrackerProject.API.Controllers
 
         }
         
-        [HttpPost("{id}/AddBookSection")]
-        public async Task<ActionResult<BookSectionResponse>> AddBookSection(Guid id, [FromBody] BookSectionCreationForm sectionform)
+        [HttpPost("{id}/Section")]
+        public async Task<ActionResult<SectionResponse>> AddBookSection(Guid id, [FromBody] SectionCreationForm sectionform)
         {
             var book = await _bookRepository.GetById(id);
 
@@ -221,7 +229,7 @@ namespace CrackerProject.API.Controllers
                 });
             }
 
-            var responsemodel = _mapper.Map<BookSectionResponse>(booksection);
+            var responsemodel = _mapper.Map<SectionResponse>(booksection);
 
             return Ok(new { 
                 Success = true,
@@ -230,8 +238,8 @@ namespace CrackerProject.API.Controllers
             });
         }
 
-        [HttpGet("{id}/GetBookSection")]
-        public async Task<ActionResult<IEnumerable<BookSectionResponse>>> GetBookSection(Guid id)
+        [HttpGet("{id}/Section")]
+        public async Task<ActionResult<IEnumerable<SectionResponse>>> GetBookSection(Guid id)
         {
             try
             {
@@ -246,9 +254,9 @@ namespace CrackerProject.API.Controllers
                     });
                 }
 
-                var filteredsection = await _booksectionRepository.Find("book_id", id);
+                var allsections = await _booksectionRepository.Find(x => x.BookId == id);
 
-                if(filteredsection == null)
+                if(allsections == null)
                 {
                     return NotFound(new
                     {
@@ -257,7 +265,7 @@ namespace CrackerProject.API.Controllers
                     });
                 }
 
-                var responsemodel = _mapper.Map<IList<BookSectionResponse>>(filteredsection);
+                var responsemodel = _mapper.Map<IList<SectionResponse>>(allsections);
 
                 return Ok(new
                 {
@@ -277,5 +285,121 @@ namespace CrackerProject.API.Controllers
 
 
         }
+
+        [HttpDelete("{id}/Section/{sectionid}")]
+        public async Task<ActionResult<IEnumerable<SectionResponse>>> DeleteBookSection(Guid id, Guid sectionid)
+        {
+            var booksection = await _booksectionRepository.GetById(sectionid);
+
+            if(booksection == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"Book section with id = {sectionid} is not found",
+                });
+            }
+
+            var response = _mapper.Map<SectionResponse>(booksection);
+
+            if(booksection.BookId != id)
+            {
+                if(booksection.BookId == Guid.Empty || booksection.BookId == null)
+                {
+                    _booksectionRepository.Remove(sectionid);
+
+                    var result = await _unitOfWork.Commit();
+
+                    if(result == false)
+                    {
+                        return NotFound(new
+                        {
+                            success = false,
+                            message = "Failed to delete."
+                        });
+                    }
+                    return Ok(new
+                    {
+                        success = true,
+                        message = $"Book Section with id = {booksection.Id} is successfully deleted. But this book section is not associated to book with id = {id}",
+                        booksection = response,
+                    });
+                }
+
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"Book section is not associated to book with {id}",
+                });
+            }
+
+            _booksectionRepository.Remove(sectionid);
+            var result2= await _unitOfWork.Commit();
+
+            if(result2 == false)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = "Failed to delete."
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                message = $"Book Section with id = {booksection.Id} is successfully deleted.",
+                booksection = response,
+            });
+            
+        }
+
+        [HttpPut("{id}/BookSection/{sectionid}")]
+        public async Task<ActionResult<IEnumerable<SectionResponse>>> UpdateBookSection(Guid id, Guid sectionid, [FromBody] SectionCreationForm form)
+        {
+            var booksection = await _booksectionRepository.GetById(sectionid);
+
+            if (booksection == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"Book section with id = {sectionid} is not found",
+                });
+            }
+
+            if(booksection.BookId != id)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = $"Book section is not associated to book with {id}",
+                });
+            }
+
+            _mapper.Map(form, booksection);
+            _booksectionRepository.Update(booksection);
+            var issaved = await _unitOfWork.Commit();
+
+            var response = _mapper.Map<SectionResponse>(booksection);
+
+            if (issaved == false)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = "Failed to update.",
+                    response = response,
+                });
+            }
+
+            return Ok(new
+            {
+                success = true,
+                message = $"Book Section with id = {sectionid} Successfully updated",
+            });
+        }
+
+
     }
 }
