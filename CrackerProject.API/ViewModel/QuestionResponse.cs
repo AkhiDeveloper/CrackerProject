@@ -15,6 +15,9 @@ namespace CrackerProject.API.ViewModel
         [BsonRequired]
         public string Body { get; set; } = String.Empty;
 
+        [BsonElement("imageUri")]
+        public string? ImageUri { get; set; } = null;
+
         [BsonElement("created_date")]
         [BsonRequired]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;

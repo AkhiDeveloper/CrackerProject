@@ -18,19 +18,22 @@ namespace CrackerProject.API.Controllers
         private readonly IQuestionSetRepository _questionSetRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public SectionsController(
             ISectionRepository booksectionRepository, 
             IQuestionSetRepository questionSetRepository,
             IUnitOfWork unitofWork, 
             IMapper mapper,
-            ISubSectionRepository subSectionRepository)
+            ISubSectionRepository subSectionRepository,
+            IWebHostEnvironment webHostEnvironment)
         {
             _sectionRepository = booksectionRepository;
             _subSectionRepository = subSectionRepository;
             _questionSetRepository = questionSetRepository;
             _unitOfWork = unitofWork;
             _mapper = mapper;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet("{id}/sections")]
@@ -340,11 +343,59 @@ namespace CrackerProject.API.Controllers
             return Ok();
         }
 
-        //[HttpPost("{id}/QuestionSets/{sn}/Question")]
-        //public async Task<ActionResult<QuestionResponse>> PostQuestion(Guid id,int sn, [FromBody] QuestionForm form)
-        //{
+        [HttpPost("{id}/QuestionSets/{sn}/Question/Objective")]
+        public async Task<ActionResult<QuestionResponse>> PostObjectiveQuestion(Guid id, int sn, [FromForm] ObjectiveQuestionForm form)
+        {
+            //Checking section
+            var section = await _sectionRepository.GetById(id);
+            if (section == null)
+            {
+                return NotFound(new
+                {
+                    message = $"Section is not found."
+                });
+            }
 
-        //}
+            //Checking QuestionSet
+            if (section.QuestionSets == null || section.QuestionSets.Count() < 1)
+            {
+                return NotFound(new
+                {
+                    message = "No Question Set is found in this Section"
+                });
+            }
+
+            //Uploading Pictures
+
+
+            //Adding Question
+            var question = _mapper.Map<ObjectiveQuestion>(form);
+            var questionset = section.QuestionSets.FirstOrDefault(x => x.SN == sn);
+            if(questionset == null)
+            {
+                return NotFound(new
+                {
+                    message = $"No Question Set with \bSN = \b{sn} is found"
+                });
+            }
+            questionset.Questions.Add(question);
+
+            //Saving
+            _sectionRepository.Update(section);
+            var result = await _unitOfWork.Commit();
+            if (result == false)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Failed to save question set."
+                });
+            }
+
+            //Creating Response
+            var response = _mapper.Map<QuestionResponse>(question);
+            return Ok(response);
+        }
     }
 
     

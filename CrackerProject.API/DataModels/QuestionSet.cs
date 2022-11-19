@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using CrackerProject.API.DataModels;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace CrackerProject.API.Models
 {
@@ -14,6 +15,9 @@ namespace CrackerProject.API.Models
         public DateTime AddedDate { get; set; } = DateTime.UtcNow;
 
         [BsonElement("questions")]
-        public IList<Question> questions { get; set; } = new List<Question>();
+        public IList<Question> Questions { get; set; } = new List<Question>();
+
+        [BsonElement("objective_questions")]
+        public IList<ObjectiveQuestion> ObjectiveQuestions { get; set; } = new List<ObjectiveQuestion>();
     }
 }

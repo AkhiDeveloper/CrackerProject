@@ -1,9 +1,9 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.Models
+namespace CrackerProject.API.ViewModel
 {
-    public class Option
-    { 
+    public class OptionResponse
+    {
         [BsonElement("sn")]
         [BsonRequired]
         public int SN { get; set; }
