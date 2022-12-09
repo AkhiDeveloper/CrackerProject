@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrackerProject.API", "CrackerProject.API\CrackerProject.API.csproj", "{1238FA19-BDAD-468A-B7ED-02FE49730593}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackerProject.API", "CrackerProject.API\CrackerProject.API.csproj", "{1238FA19-BDAD-468A-B7ED-02FE49730593}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackerProject.UnitTesting", "CrackerProject.UnitTesting\CrackerProject.UnitTesting.csproj", "{73D389EA-82C5-48A7-B0D9-2F1A210806A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{1238FA19-BDAD-468A-B7ED-02FE49730593}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1238FA19-BDAD-468A-B7ED-02FE49730593}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1238FA19-BDAD-468A-B7ED-02FE49730593}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73D389EA-82C5-48A7-B0D9-2F1A210806A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73D389EA-82C5-48A7-B0D9-2F1A210806A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73D389EA-82C5-48A7-B0D9-2F1A210806A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73D389EA-82C5-48A7-B0D9-2F1A210806A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

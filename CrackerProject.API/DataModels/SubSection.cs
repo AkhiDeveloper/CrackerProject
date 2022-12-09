@@ -6,6 +6,6 @@ namespace CrackerProject.API.DataModels
     {
         [BsonElement("parentSection_id")]
         [BsonRequired]
-        public Guid? ParentBookSectionId { get; set; }
+        public Guid? ParentSectionId { get; set; }
     }
 }

@@ -2,11 +2,12 @@ using CrackerProject.API.Context;
 using CrackerProject.API.Interfaces;
 using CrackerProject.API.Persistence;
 using CrackerProject.API.Repository;
-using CrackerProject.API.Services;
 using CrackerProject.API.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.GenericRepository.UoW;
+using AutoMapper.Extensions.ExpressionMapping;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,21 +18,30 @@ var mongodbSettings = builder.Configuration
 
 builder.Services.AddSingleton<MongoDbSettings>(mongodbSettings);
 
+var firebaseconfig=builder.Configuration
+    .GetSection(nameof(FirebaseConfig).ToLower())
+    .Get<FirebaseConfig>();
+builder.Services.AddSingleton<FirebaseConfig>(firebaseconfig);
+
 builder.Services.AddSingleton<IMongoClient>(
     s => new MongoClient(mongodbSettings.ConnectionString));
 
-builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IMongoContext, MongoContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ISectionRepository, SectionRepository>();
-builder.Services.AddScoped<ISubSectionRepository, SubSectionRepository>();
-builder.Services.AddScoped<ISectionRepository, SectionRepository>();
-builder.Services.AddScoped<IBookSectionRepository, BookSectionRepository>();
 builder.Services.AddScoped<IQuestionSetRepository, QuestionSetRepository>();
+builder.Services.AddScoped<IStorageManager, FirebaseStorageManager>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//Adding Automapper Service
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddExpressionMapping();
+},
+AppDomain.CurrentDomain.GetAssemblies());
+
 
 builder.Services.AddControllers();
 

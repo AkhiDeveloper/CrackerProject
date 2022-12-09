@@ -1,6 +1,8 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using CrackerProject.API.Interfaces;
+using CrackerProject.API.Repository;
+using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.Models
+namespace CrackerProject.API.DataModels
 {
     public class Question
     {

@@ -1,10 +1,13 @@
 ﻿using CrackerProject.API.DataModels;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.Models
+namespace CrackerProject.API.DataModels
 {
     public class QuestionSet
     {
+        [BsonId]
+        public Guid Id { get; set; }
+
         [BsonElement("sn")]
         public int SN { get; set; }
 

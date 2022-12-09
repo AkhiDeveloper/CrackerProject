@@ -1,5 +1,5 @@
 ﻿
-using CrackerProject.API.Models;
+using CrackerProject.API.DataModels;
 using MongoDB.Bson.Serialization;
 
 namespace CrackerProject.API.Persistence

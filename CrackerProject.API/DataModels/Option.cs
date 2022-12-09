@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.Models
+namespace CrackerProject.API.DataModels
 {
     public class Option
     { 

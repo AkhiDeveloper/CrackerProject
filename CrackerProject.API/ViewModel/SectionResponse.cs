@@ -1,4 +1,4 @@
-﻿using CrackerProject.API.Models;
+﻿
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace CrackerProject.API.ViewModel

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CrackerProject.API.Interfaces;
-using CrackerProject.API.Models;
+using CrackerProject.API.Model;
 using CrackerProject.API.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,230 +12,141 @@ namespace CrackerProject.API.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
-        private readonly IBookSectionRepository _booksectionRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ISectionRepository _sectionRepository;
 
         public BooksController(
-            IBookRepository? bookRepository,
-            IUnitOfWork? unitofwork,
-            IBookSectionRepository booksectionRepository,
+            IBookRepository bookRepository,
+            IUnitOfWork unitofwork,
+            ISectionRepository sectionRepository,
             IMapper mapper)
         {
             _bookRepository = bookRepository;
             _unitOfWork = unitofwork;
-            _booksectionRepository = booksectionRepository;
             _mapper = mapper;
+            _sectionRepository = sectionRepository;
         }
 
         [HttpPost]
         public async Task<ActionResult<BookResponse>> Post([FromBody] BookCreationForm value)
         {
-            var newbook = _mapper.Map<Book>(value);
-
-            _bookRepository.Add(newbook);
-
-            await _unitOfWork.Commit();
-
-            var book = await _bookRepository.GetById(newbook.Id);
-
-            if (book == null)
+            try
             {
-                return NotFound(new
-                {
-                    success = false,
-                    message = $"{newbook} is failed to save book"
-                }
-                );
+                var newbook = _mapper.Map<Book>(value);
+                _bookRepository.Add(newbook);
+                await _unitOfWork.Commit();
+                var responsemodel = _mapper.Map<BookResponse>(newbook);
+                return Ok(responsemodel);
             }
-
-            var responsemodel = _mapper.Map<BookResponse>(book);
-
-            return Ok(new
+            catch (Exception exp)
             {
-                success = true,
-                response = responsemodel,
-            });
+                return BadRequest(exp.Message);
+            }
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<BookResponse>>> GetAll()
+        public async Task<ActionResult<IEnumerable<BookResponse>>> GetAll()
         {
-            var books = await _bookRepository.GetAll();
-
-            if (books == null)
+            try
             {
-                return NotFound(new
-                {
-                    success = false,
-                    Message = "Failed to get books or books are not available"
-                });
+                var books = await _bookRepository.GetAll();
+
+                var responsemodel = _mapper.Map<IEnumerable<BookResponse>>(books);
+
+                return Ok(responsemodel);
             }
-
-            var responsemodel = _mapper.Map<IEnumerable<BookResponse>>(books);
-
-            return Ok(new
+            catch(Exception ex)
             {
-                success = true,
-                response = responsemodel,
-            });
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<BookResponse>> Get(Guid id)
         {
-            var book = await _bookRepository.GetById(id);
-
-            if (book == null)
+            try
             {
-                return NotFound(new
-                {
-                    success = false,
-                    Message = $"Book of id = {id} is not available"
-                });
+                var book = await _bookRepository.GetById(id);
+                var responsemodel = _mapper.Map<BookResponse>(book);
+                return Ok(responsemodel);
             }
-
-            var responsemodel = _mapper.Map<BookResponse>(book);
-            return Ok(new
+            catch(Exception ex)
             {
-                success = true,
-                response = responsemodel,
-            });
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<BookResponse>> Update(Guid id, BookCreationForm form)
         {
-            var book = await _bookRepository.GetById(id);
-
-            if(book == null)
+            try
             {
-                return NotFound($"Book of {id} not found");
+                var book = await _bookRepository.GetById(id);
+                _mapper.Map(form, book);
+                _bookRepository.Update(book);
+                var issaved = await _unitOfWork.Commit();
+                if (issaved == false)
+                {
+                    return BadRequest($"Failed to update Book of id = {id}");
+                }
+                var responsemodel = _mapper.Map<BookResponse>(book);
+                return Ok(responsemodel);
             }
-
-            _mapper.Map(form, book);
-
-            _bookRepository.Update(book);
-
-            var issaved=await _unitOfWork.Commit();
-
-            if (issaved == false)
+            catch(Exception exp)
             {
-                return NotFound($"Failed to update Book of id = {id}");
+                return BadRequest(exp.Message);
             }
-
-            var checkbook = await _bookRepository.GetById(id);
-
-            var responsemodel = _mapper.Map<BookResponse>(checkbook);
-
-            return Ok(new
-            {
-                success = true,
-                response = responsemodel,
-            });
+            
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<BookResponse>> Delete(Guid id)
         {
-            var storedbook = await _bookRepository.GetById(id);
-
-            if(storedbook == null)
+            try
             {
-                return NotFound(new
+                _bookRepository.RemoveAsync(id);
+                await _sectionRepository.RemoveBookSections(id, DeleteType.AssociatedAlso);
+                var iscompleted = await _unitOfWork.Commit();
+                if (iscompleted == false)
                 {
-                    success = false,
-                    message = $"Book with id = {id} is not existed",
-                });
+                    return BadRequest($"{id} is failed to delete");
+                }
+
+                return Ok();
             }
-
-            _bookRepository.Remove(id);
-
-            var booksections = await _booksectionRepository.Find(x => x.BookId == id);
-
-            foreach(var section in booksections)
+            catch(Exception exp)
             {
-                _booksectionRepository.Remove(section.Id);
+                return BadRequest(exp.Message);
             }
-            
-            var iscompleted = await _unitOfWork.Commit();
-
-            if(iscompleted == false)
-            {
-                return NotFound($"{storedbook} is failed to delete");
-            }
-
-            var responsemodel = _mapper.Map<BookResponse>(storedbook);
-
-            return Ok(new
-            {
-                success = true,
-                message = $"Book with id = {id} is deleted",
-                response = responsemodel,
-            });
 
         }
         
         [HttpPost("{id}/Section")]
         public async Task<ActionResult<SectionResponse>> AddBookSection(Guid id, [FromBody] SectionCreationForm sectionform)
         {
-            var book = await _bookRepository.GetById(id);
-
-            if(book == null)
+            try
             {
-                return NotFound(new 
-                { 
-                    Success =  false,
-                    Message = $"Book with {id} is not found.", 
-                });
-            }
+                var section = _mapper.Map<Section>(sectionform);
+                await _sectionRepository.AddtoBook(id, section);
 
-            if(sectionform == null)
-            {
-                return BadRequest(new
+                var result = await _unitOfWork.Commit();
+                if (result == false)
                 {
-                    Success = false,
-                    Message = $"Invalid Data in section form.",
-                    Model = sectionform,
-                });
+                    return BadRequest("Failed to Save Book Section Data.");
+                }
+
+                var responsemodel = _mapper.Map<SectionResponse>(section);
+
+                return Ok(responsemodel);
             }
-
-            var section = _mapper.Map<BookSection>(sectionform);
-
-            section.BookId = id;
-
-            _booksectionRepository.Add(section);
-
-            var result = await _unitOfWork.Commit();
-
-            if(result == false)
+            catch(Exception exp)
             {
-                return NotFound(new
-                {
-                    Success = false,
-                    Message = "Failed to Save Book Section Data.",
-                    Model = section,
-                });
+                return BadRequest(exp.Message);
             }
-            var booksection = await _booksectionRepository.GetById(section.Id);
-
-            if(booksection == null)
-            {
-                return NotFound(new
-                {
-                    Success = false,
-                    Message = "Failed to Save Book Section Data.",
-                    Model = section,
-                });
-            }
-
-            var responsemodel = _mapper.Map<SectionResponse>(booksection);
-
-            return Ok(new { 
-                Success = true,
-                Message="Sucessfully saved Book section.",
-                Model =  responsemodel,
-            });
+            
         }
 
         [HttpGet("{id}/Section")]
@@ -243,163 +154,19 @@ namespace CrackerProject.API.Controllers
         {
             try
             {
-                var book = await _bookRepository.GetById(id);
+                var sections = await _sectionRepository.GetfromBook(id);
 
-                if (book == null)
-                {
-                    return NotFound(new
-                    {
-                        Success = false,
-                        Message = $"Book with {id} is not found.",
-                    });
-                }
+                var responsemodel = _mapper.Map<IList<SectionResponse>>(sections);
 
-                var allsections = await _booksectionRepository.Find(x => x.BookId == id);
-
-                if(allsections == null)
-                {
-                    return NotFound(new
-                    {
-                        Success = false,
-                        Message = $"Book section not found of book with {id}"
-                    });
-                }
-
-                var responsemodel = _mapper.Map<IList<SectionResponse>>(allsections);
-
-                return Ok(new
-                {
-                    success = true,
-                    response = responsemodel,
-                });
+                return Ok(responsemodel);
 
             }
             catch(Exception e)
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = e.Message,
-                });
+                return BadRequest(e.Message);
             }
-
-
         }
 
-        [HttpDelete("{id}/Section/{sectionid}")]
-        public async Task<ActionResult<IEnumerable<SectionResponse>>> DeleteBookSection(Guid id, Guid sectionid)
-        {
-            var booksection = await _booksectionRepository.GetById(sectionid);
-
-            if(booksection == null)
-            {
-                return NotFound(new
-                {
-                    success = false,
-                    message = $"Book section with id = {sectionid} is not found",
-                });
-            }
-
-            var response = _mapper.Map<SectionResponse>(booksection);
-
-            if(booksection.BookId != id)
-            {
-                if(booksection.BookId == Guid.Empty || booksection.BookId == null)
-                {
-                    _booksectionRepository.Remove(sectionid);
-
-                    var result = await _unitOfWork.Commit();
-
-                    if(result == false)
-                    {
-                        return NotFound(new
-                        {
-                            success = false,
-                            message = "Failed to delete."
-                        });
-                    }
-                    return Ok(new
-                    {
-                        success = true,
-                        message = $"Book Section with id = {booksection.Id} is successfully deleted. But this book section is not associated to book with id = {id}",
-                        booksection = response,
-                    });
-                }
-
-                return NotFound(new
-                {
-                    success = false,
-                    message = $"Book section is not associated to book with {id}",
-                });
-            }
-
-            _booksectionRepository.Remove(sectionid);
-            var result2= await _unitOfWork.Commit();
-
-            if(result2 == false)
-            {
-                return NotFound(new
-                {
-                    success = false,
-                    message = "Failed to delete."
-                });
-            }
-
-            return Ok(new
-            {
-                success = true,
-                message = $"Book Section with id = {booksection.Id} is successfully deleted.",
-                booksection = response,
-            });
-            
-        }
-
-        [HttpPut("{id}/BookSection/{sectionid}")]
-        public async Task<ActionResult<IEnumerable<SectionResponse>>> UpdateBookSection(Guid id, Guid sectionid, [FromBody] SectionCreationForm form)
-        {
-            var booksection = await _booksectionRepository.GetById(sectionid);
-
-            if (booksection == null)
-            {
-                return NotFound(new
-                {
-                    success = false,
-                    message = $"Book section with id = {sectionid} is not found",
-                });
-            }
-
-            if(booksection.BookId != id)
-            {
-                return NotFound(new
-                {
-                    success = false,
-                    message = $"Book section is not associated to book with {id}",
-                });
-            }
-
-            _mapper.Map(form, booksection);
-            _booksectionRepository.Update(booksection);
-            var issaved = await _unitOfWork.Commit();
-
-            var response = _mapper.Map<SectionResponse>(booksection);
-
-            if (issaved == false)
-            {
-                return NotFound(new
-                {
-                    success = false,
-                    message = "Failed to update.",
-                    response = response,
-                });
-            }
-
-            return Ok(new
-            {
-                success = true,
-                message = $"Book Section with id = {sectionid} Successfully updated",
-            });
-        }
-
-
+        
     }
 }

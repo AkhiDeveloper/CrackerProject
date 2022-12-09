@@ -8,52 +8,61 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Humanizer;
 using System.Linq.Expressions;
+using AutoMapper;
 
 namespace CrackerProject.API.Repository
 {
-    public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : class
+    public abstract class BaseRepository<TModel, TDataModel, TIdentifier> 
+        : IRepository<TModel, TDataModel, TIdentifier> where TModel : class where TDataModel : class
     {
+        protected readonly IMapper _mapper;
         protected readonly IMongoContext Context;
-        protected IMongoCollection<TEntity> DbSet;
+        protected IMongoCollection<TDataModel> DbSet;
 
-        protected BaseRepository(IMongoContext context)
+        protected BaseRepository(IMongoContext context, IMapper mapper)
         {
             Context = context;
-
-            DbSet = Context.GetCollection<TEntity>(typeof(TEntity).Name.Pluralize());
+            _mapper = mapper;
+            DbSet = Context.GetCollection<TDataModel>(typeof(TDataModel).Name.Pluralize());
         }
 
-        public virtual void Add(TEntity obj)
+        public virtual void Add(TModel obj)
         {
-            Context.AddCommand(() => DbSet.InsertOneAsync(obj));
+            var data = _mapper.Map<TDataModel>(obj);
+            Context.AddCommand(() => DbSet.InsertOneAsync(data));
         }
 
-        public virtual async Task<TEntity> GetById(Guid id)
+        public virtual async Task<TModel> GetById(TIdentifier id)
         {
-            var data = await DbSet.FindAsync(Builders<TEntity>.Filter.Eq("_id", id));
-            return data.SingleOrDefault();
+            var cursor = await DbSet.FindAsync(Builders<TDataModel>.Filter.Eq("_id", id));
+            var data = await cursor.SingleOrDefaultAsync();
+            var obj = _mapper.Map<TModel>(data);
+            return obj;
         }
 
-        public virtual async Task<IEnumerable<TEntity>> GetAll()
+        public virtual async Task<IEnumerable<TModel>> GetAll()
         {
-            var all = await DbSet.FindAsync(Builders<TEntity>.Filter.Empty);
-            return all.ToList();
+            var cursor = await DbSet.FindAsync(Builders<TDataModel>.Filter.Empty);
+            var data = cursor.ToList();
+            var obj = _mapper.Map<IEnumerable<TModel>>(data);
+            return obj;
         }
 
-        public virtual void Update(TEntity obj)
+        public virtual void Update(TModel obj)
         {
-            Context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", obj.GetId()), obj));
+            var data = _mapper.Map<TDataModel>(obj);
+            Context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TDataModel>.Filter.Eq("_id", obj.GetId()), data));
         }
 
-        public virtual void Remove(Guid id)
+        public virtual void RemoveAsync(TIdentifier id)
         {
-            Context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", id)));
+            Context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TDataModel>.Filter.Eq("_id", id)));
         }
 
-        public virtual async Task<IList<TEntity>> Find<U>(string fieldname, U fieldvalue)
+        public virtual async Task<IList<TModel>> Find<U>(string fieldname, U fieldvalue)
         {
-            var result = await DbSet.FindAsync(Builders<TEntity>.Filter.Eq(fieldname,fieldvalue));
-            return await result.ToListAsync();
+            var result = await DbSet.FindAsync(Builders<TDataModel>.Filter.Eq(fieldname,fieldvalue));
+            return _mapper.Map<IList<TModel>>(result.ToList());
         }
 
         public void Dispose()
@@ -61,15 +70,18 @@ namespace CrackerProject.API.Repository
             Context?.Dispose();
         }
 
-        public virtual async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> expression)
+        public virtual async Task<IEnumerable<TModel>> Find(Expression<Func<TModel, bool>> expression)
         {
-            var result = await DbSet.FindAsync(expression);
-            return await result.ToListAsync();
+            var dataexp = _mapper.Map<Expression<Func<TDataModel, bool>>>(expression);
+            var cursor = await DbSet.FindAsync(dataexp);
+            var data = await cursor.ToListAsync();
+            var objs = _mapper.Map<IEnumerable<TModel>>(data);
+            return objs;
         }
 
-        public async Task<bool> IsExist(Guid id)
+        public async Task<bool> IsExist(TIdentifier id)
         {
-            var cursor = await DbSet.FindAsync<TEntity>(Builders<TEntity>.Filter.Eq("_id", id));
+            var cursor = await DbSet.FindAsync<TDataModel>(Builders<TDataModel>.Filter.Eq("_id", id.GetId()));
             var result = await cursor.ToListAsync();
             if(result.Count < 1) return false;
             return true;

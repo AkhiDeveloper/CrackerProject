@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
-namespace CrackerProject.API.Models
+namespace CrackerProject.API.DataModels
 {
     [BsonIgnoreExtraElements]
     public class Book
