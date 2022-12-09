@@ -10,7 +10,7 @@ namespace CrackerProject.API.AutoMapper
             //QuestionSet
             CreateMap<Model.QuestionSet, DataModels.QuestionSet>();
             CreateMap<DataModels.QuestionSet, Model.QuestionSet>();
-            CreateMap<Model.QuestionSet, ViewModel.OptionSetResponse>();
+            CreateMap<Model.QuestionSet, ViewModel.QuestionSetResponse>();
             CreateMap<ViewModel.QuestionSetForm, Model.QuestionSet>();
         }
     }

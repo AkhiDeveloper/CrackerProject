@@ -5,9 +5,9 @@ namespace CrackerProject.API.Model
 {
     public class QuestionSet
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        public int QuestionSetSN { get; set; }
+        public int SN { get; set; }
 
         public string Description { get; set; } = String.Empty;
 

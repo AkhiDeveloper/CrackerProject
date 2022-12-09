@@ -5,10 +5,11 @@ namespace CrackerProject.API.ViewModel
 {
     public class QuestionSetResponse
     {
-        public int? SN { get; set; } = null;
+        public Guid Id { get; set; }
+        public int SN { get; set; }
 
-        public string? Description { get; set; } = null;
+        public string Description { get; set; }
 
-        public DateTime? AddedDate { get; set; } = null;
+        public DateTime AddedDate { get; set; }
     }
 }

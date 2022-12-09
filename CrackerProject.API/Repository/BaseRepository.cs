@@ -81,7 +81,7 @@ namespace CrackerProject.API.Repository
 
         public async Task<bool> IsExist(TIdentifier id)
         {
-            var cursor = await DbSet.FindAsync<TDataModel>(Builders<TDataModel>.Filter.Eq("_id", id.GetId()));
+            var cursor = await DbSet.FindAsync<TDataModel>(Builders<TDataModel>.Filter.Eq("_id", id));
             var result = await cursor.ToListAsync();
             if(result.Count < 1) return false;
             return true;

@@ -113,11 +113,7 @@ namespace CrackerProject.API.Controllers
                 var result = await _unitOfWork.Commit();
                 if (result == false)
                 {
-                    return BadRequest(new
-                    {
-                        success = false,
-                        message = $"Failed to update."
-                    });
+                    return BadRequest($"Failed to update.");
                 }
 
                 //Success Response
@@ -138,10 +134,7 @@ namespace CrackerProject.API.Controllers
                 //Checking Section
                 if (await _sectionRepository.IsExist(id) == false)
                 {
-                    return NotFound(new
-                    {
-                        message = "Section is not found."
-                    });
+                    return BadRequest("Section is not found.");
                 }
 
                 //Adding Questionset
