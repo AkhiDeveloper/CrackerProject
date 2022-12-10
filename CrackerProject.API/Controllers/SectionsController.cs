@@ -131,13 +131,6 @@ namespace CrackerProject.API.Controllers
         {
             try
             {
-                //Checking Section
-                if (await _sectionRepository.IsExist(id) == false)
-                {
-                    return BadRequest("Section is not found.");
-                }
-
-                //Adding Questionset
                 var questionSet = _mapper.Map<QuestionSet>(form);
                 await _questionSetRepository.AddtoSection(id, questionSet);
                 var result = await _unitOfWork.Commit();
