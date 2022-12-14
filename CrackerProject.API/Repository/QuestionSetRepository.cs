@@ -17,9 +17,69 @@ namespace CrackerProject.API.Repository
                 (nameof(DataModels.Section).Pluralize());
         }
 
+        private async Task<DataModels.Section> GetParentSection(Guid questionset_id)
+        {
+            var originsectioncursor = await _sections.FindAsync(x =>
+            x.QuestionSets.Any(q =>
+            q.Id == questionset_id));
+            var originsection = originsectioncursor.FirstOrDefault();
+            if (originsection == null)
+            {
+                throw new NullReferenceException
+                    ($"Questionset with id ={questionset_id} is not found.");
+            }
+            return originsection;
+        }
+
+        public override void AddAsync(QuestionSet obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Update(QuestionSet obj)
+        {
+            var originsection = GetParentSection(obj.Id).GetResult();
+            var questionset = originsection.QuestionSets
+                .FirstOrDefault(x => x.Id == obj.Id);
+            _mapper.Map(obj, questionset);
+            Context.AddCommand(() => _sections
+            .ReplaceOneAsync(x => x.Id == originsection.Id, originsection));
+        }
+
+        public override Task<IEnumerable<QuestionSet>> Find(Expression<Func<QuestionSet, bool>> expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IList<QuestionSet>> Find<U>(string fieldname, U fieldvalue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task<QuestionSet> GetById(Guid id)
+        {
+            var parentsectiondata = await GetParentSection(id);
+            var questionsetdata = parentsectiondata.QuestionSets.FirstOrDefault(x => x.Id == id);
+            var questionset = _mapper.Map<Model.QuestionSet>(questionsetdata);
+            return questionset;
+        }
+
+        public override Task<IEnumerable<QuestionSet>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async void RemoveAsync(Guid id)
+        {
+            var parentsectiondata = await GetParentSection(id);
+            var questionsetdata = parentsectiondata.QuestionSets.FirstOrDefault(x => x.Id == id);
+            parentsectiondata.QuestionSets.Remove(questionsetdata);
+            Context.AddCommand(() => _sections.ReplaceOneAsync(x => x.Id == id, parentsectiondata));
+        }
+
         public async Task AddtoSection(Guid sectionid, QuestionSet questionset)
         {
-            var sectioncursor=await _sections.FindAsync(x=>x.Id == sectionid);
+            var sectioncursor = await _sections.FindAsync(x => x.Id == sectionid);
             var section = sectioncursor.FirstOrDefault();
             if(section == null)
             {
@@ -55,7 +115,8 @@ namespace CrackerProject.API.Repository
 
         public async Task<bool> IsExistInSection(Guid sectionid, Guid questionset_id)
         {
-            var sectioncursor = await _sections.FindAsync(x => x.Id == sectionid);
+            var sectioncursor = await _sections
+                .FindAsync(x => x.Id == sectionid);
             var section = sectioncursor.FirstOrDefault();
             if (section == null)
             {
@@ -66,7 +127,7 @@ namespace CrackerProject.API.Repository
             return isexist;
         }
 
-        public async Task MovetoSection(Guid question_id, Guid section_id)
+        public async Task MovetoSection(Guid questionset_id, Guid section_id)
         {
             var targetsectioncursor = await _sections.FindAsync(x => x.Id == section_id);
             var targetsection = targetsectioncursor.FirstOrDefault();
@@ -75,26 +136,19 @@ namespace CrackerProject.API.Repository
                 throw new NullReferenceException
                     ($"Target Section with id ={section_id} is not found.");
             }
-            if(targetsection.QuestionSets.Any(x=>x.Id == question_id))
+            if(targetsection.QuestionSets.Any(x=>x.Id == questionset_id))
             {
                 return;
             }
+            
+            var originsection = await GetParentSection(questionset_id);
 
-            var originsectioncursor=await _sections.FindAsync(x=>
-            x.QuestionSets.Any(q=>
-            q.Id==question_id));
-            var originsection = originsectioncursor.FirstOrDefault();
-            if(originsection == null)
-            {
-                throw new NullReferenceException
-                    ($"Questionset with id ={question_id} is not found.");
-            }
             var questionsetdata = originsection.QuestionSets
-                .FirstOrDefault(x => x.Id == question_id);
+                .FirstOrDefault(x => x.Id == questionset_id);
             if(!originsection.QuestionSets.Remove(questionsetdata))
             {
                 throw new NullReferenceException
-                    ($"Questionset with id ={question_id} is not found.");
+                    ($"Questionset with id ={questionset_id} is not found.");
             }
             targetsection.QuestionSets.Add(questionsetdata);
             Context.AddCommand(() => _sections

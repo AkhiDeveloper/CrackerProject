@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CrackerProject.API.Interfaces;
+using CrackerProject.API.Model;
 using CrackerProject.API.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,7 @@ namespace CrackerProject.API.Controllers
         }
 
         [HttpPost("{id}/Questions")]
-        public async Task<ActionResult> PostQuestionSetQuestion(Guid id, [FromBody] QuestionForm questionForm)
+        public async Task<ActionResult> PostQuestionSetQuestion(Guid id, [FromForm] QuestionForm questionForm)
         {
             try
             {
@@ -87,7 +88,8 @@ namespace CrackerProject.API.Controllers
                 var isremoved=await _unitOfWork.Commit();
                 if(isremoved == false)
                 {
-                    return BadRequest($"Failed to delete QuestionSet of Id = {id}");
+                    return BadRequest
+                        ($"Failed to delete QuestionSet of Id = {id}");
                 }
                 return Ok();
             }
@@ -98,7 +100,8 @@ namespace CrackerProject.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateQuestionSet(Guid id, [FromBody] QuestionSetForm form)
+        public async Task<ActionResult> UpdateQuestionSet
+            (Guid id, [FromBody] QuestionSetForm form)
         {
             try
             {
@@ -108,7 +111,8 @@ namespace CrackerProject.API.Controllers
                 var isupdated=await _unitOfWork.Commit();
                 if(isupdated == false)
                 {
-                    return BadRequest($"Failed to Update QuestionSet of Id = {id}");
+                    return BadRequest
+                        ($"Failed to Update QuestionSet of Id = {id}");
                 }
                 return Ok();
             }

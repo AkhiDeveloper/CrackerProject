@@ -26,7 +26,7 @@ namespace CrackerProject.API.Repository
             DbSet = Context.GetCollection<TDataModel>(typeof(TDataModel).Name.Pluralize());
         }
 
-        public virtual void Add(TModel obj)
+        public virtual void AddAsync(TModel obj)
         {
             var data = _mapper.Map<TDataModel>(obj);
             Context.AddCommand(() => DbSet.InsertOneAsync(data));

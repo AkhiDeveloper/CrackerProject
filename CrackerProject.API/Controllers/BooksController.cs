@@ -34,7 +34,7 @@ namespace CrackerProject.API.Controllers
             try
             {
                 var newbook = _mapper.Map<Book>(value);
-                _bookRepository.Add(newbook);
+                _bookRepository.AddAsync(newbook);
                 await _unitOfWork.Commit();
                 var responsemodel = _mapper.Map<BookResponse>(newbook);
                 return Ok(responsemodel);

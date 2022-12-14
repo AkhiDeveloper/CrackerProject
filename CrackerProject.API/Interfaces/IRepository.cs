@@ -8,7 +8,7 @@ namespace CrackerProject.API.Interfaces
     public interface IRepository<TModel, TDataModel, Identifier> : IDisposable where TModel : class where TDataModel:class
     {
         Task<bool> IsExist(Identifier id);
-        void Add(TModel obj);
+        void AddAsync(TModel obj);
         Task<TModel> GetById(Identifier id);
         Task<IEnumerable<TModel>> GetAll();
         void Update(TModel obj);

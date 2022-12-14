@@ -1,4 +1,5 @@
 ﻿using CrackerProject.API.DataModels;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 

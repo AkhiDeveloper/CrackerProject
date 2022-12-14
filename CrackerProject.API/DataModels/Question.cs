@@ -23,5 +23,9 @@ namespace CrackerProject.API.DataModels
         [BsonElement("created_date")]
         [BsonRequired]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        [BsonElement("option_sets")]
+        [BsonRequired]
+        public IList<OptionSet> OptionSets { get; set; } = new List<OptionSet>();
     }
 }

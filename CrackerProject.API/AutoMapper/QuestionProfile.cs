@@ -8,8 +8,8 @@ namespace CrackerProject.API.AutoMapper
         public QuestionProfile()
         {
             //Question
-            CreateMap<Model.Question, DataModels.ObjectiveQuestion>();
-            CreateMap<DataModels.ObjectiveQuestion, Model.Question>();
+            CreateMap<Model.Question, DataModels.Question>();
+            CreateMap<DataModels.Question, Model.Question>();
             CreateMap<Model.Question, ViewModel.QuestionResponse>();
             CreateMap<ViewModel.QuestionForm, Model.Question>();
         }
