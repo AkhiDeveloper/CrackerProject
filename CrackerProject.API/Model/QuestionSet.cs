@@ -7,7 +7,7 @@ namespace CrackerProject.API.Model
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        public int SN { get; set; }
+        public int Sn { get; set; }
 
         public string Description { get; set; } = String.Empty;
 

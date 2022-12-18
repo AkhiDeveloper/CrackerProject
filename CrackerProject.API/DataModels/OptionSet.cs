@@ -6,7 +6,7 @@ namespace CrackerProject.API.DataModels
     {
         [BsonId]
         [BsonElement("sn")]
-        public int SN { get; set; }
+        public int Sn { get; set; }
 
         [BsonElement("options")]
         public IEnumerable<Option> Options { get; set; }

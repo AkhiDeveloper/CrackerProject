@@ -107,7 +107,7 @@ namespace CrackerProject.API.Controllers
             {
                 var questionset = await _questionSetRepository.GetById(id);
                 _mapper.Map(form, questionset);
-                _questionSetRepository.Update(questionset);
+                _questionSetRepository.UpdateAsync(questionset);
                 var isupdated=await _unitOfWork.Commit();
                 if(isupdated == false)
                 {

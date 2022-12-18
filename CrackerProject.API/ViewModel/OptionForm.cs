@@ -6,14 +6,11 @@ namespace CrackerProject.API.ViewModel
     {
         [BsonElement("sn")]
         [BsonRequired]
-        public int SN { get; set; } = 1;
+        public int Sn { get; set; } = 1;
 
         [BsonElement("body")]
         [BsonRequired]
         public string Body { get; set; }
-
-        [BsonElement("image")]
-        public IFormFile? ImageFile { get; set; }
 
         [BsonElement("isCorrect")]
         [BsonRequired]

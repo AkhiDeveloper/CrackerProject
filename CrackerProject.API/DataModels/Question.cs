@@ -7,7 +7,7 @@ namespace CrackerProject.API.DataModels
     public class Question
     {
         [BsonId]
-        public Guid id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [BsonElement("sn")]
         [BsonRequired]

@@ -36,7 +36,7 @@ namespace CrackerProject.API.Repository
             throw new NotImplementedException();
         }
 
-        public override void Update(QuestionSet obj)
+        public override void UpdateAsync(QuestionSet obj)
         {
             var originsection = GetParentSection(obj.Id).GetResult();
             var questionset = originsection.QuestionSets

@@ -9,7 +9,7 @@ namespace CrackerProject.API.DataModels
         public Guid Id { get; set; }
 
         [BsonElement("sn")]
-        public int SN { get; set; }
+        public int Sn { get; set; }
 
         [BsonElement("description")]
         public string Description { get; set; } = String.Empty;

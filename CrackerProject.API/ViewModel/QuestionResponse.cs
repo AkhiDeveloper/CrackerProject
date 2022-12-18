@@ -5,7 +5,7 @@ namespace CrackerProject.API.ViewModel
 {
     public class QuestionResponse
     {
-        public Guid id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         [BsonElement("sn")]
         [BsonRequired]

@@ -5,6 +5,6 @@ namespace CrackerProject.API.Model
     public class OptionSet
     {
         public int Sn { get; set; }
-        public IEnumerable<Option> Options { get; set; }
+        public IList<Option> Options { get; set; } = new List<Option>();
     }
 }

@@ -6,7 +6,7 @@ namespace CrackerProject.API.ViewModel
     public class QuestionSetResponse
     {
         public Guid Id { get; set; }
-        public int SN { get; set; }
+        public int Sn { get; set; }
 
         public string Description { get; set; }
 

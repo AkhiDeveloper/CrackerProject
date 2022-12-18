@@ -12,6 +12,10 @@ namespace CrackerProject.API.AutoMapper
             CreateMap<DataModels.Question, Model.Question>();
             CreateMap<Model.Question, ViewModel.QuestionResponse>();
             CreateMap<ViewModel.QuestionForm, Model.Question>();
+            CreateMap<ViewModel.OptionForm, Model.Option>();
+            CreateMap<Model.Option, ViewModel.OptionResponse>();
+            CreateMap<Model.Option, DataModels.Option>().ReverseMap();  
+            CreateMap<Model.OptionSet, DataModels.OptionSet>().ReverseMap();
         }
     }
 }

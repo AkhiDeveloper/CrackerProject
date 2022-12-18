@@ -21,7 +21,7 @@ namespace CrackerProject.API.Repository
             var parentsectioncursor = await _sections.FindAsync(s =>
             s.QuestionSets.Any(qs =>
             qs.Questions.Any(q =>
-            q.id == question_id)));
+            q.Id == question_id)));
             var parentsection = parentsectioncursor.FirstOrDefault();
             if(parentsection == null)
             {
@@ -43,6 +43,82 @@ namespace CrackerProject.API.Repository
                     ($"Questionset with id ={questionset_id} is not found.");
             }
             return originsection;
+        }
+
+        public override void AddAsync(Question obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task<IEnumerable<Question>> Find(Expression<Func<Question, bool>> expression)
+        {
+            var questions = new List<Question>();
+            var dataexpression = _mapper.Map<Expression<Func<DataModels.Question, bool>>>(expression);
+            var sectioncursors = await _sections
+                .FindAsync(s=>s.QuestionSets
+                .Any(qs => qs.Questions
+                .Any(dataexpression.Compile())));
+            var sections = sectioncursors.ToList();
+            foreach (var section in sections)
+            {
+                foreach (var questionset in section.QuestionSets)
+                {
+                    questions.AddRange(_mapper
+                        .Map<IEnumerable<Question>>(questionset.Questions));
+                }
+            }
+            return questions;
+        }
+
+        public override Task<IList<Question>> Find<U>(string fieldname, U fieldvalue)
+        {
+            return base.Find(fieldname, fieldvalue);
+        }
+
+        public override async Task<IEnumerable<Question>> GetAll()
+        {
+            var questions = new List<Question>();
+            var sectioncursors = await _sections.FindAsync(Builders<DataModels.Section>.Filter.Empty);
+            var sections = sectioncursors.ToList();
+            foreach(var section in sections)
+            {
+                foreach(var questionset in section.QuestionSets)
+                {
+                    questions.AddRange(_mapper
+                        .Map<IEnumerable<Question>>(questionset.Questions));
+                }
+            }
+            return questions;
+        }
+
+        public override async Task<Question> GetById(Guid id)
+        {
+            var parentsection = await GetParentSectionofQuestion(id);
+            var questionset = parentsection.QuestionSets
+                .FirstOrDefault(x => x.Questions.Any(x => x.Id == id));
+            var questiondata = questionset.Questions.FirstOrDefault(x => x.Id == id);
+            var questionmodel = _mapper.Map<Question>(questiondata);
+            return questionmodel;
+        }
+
+        public override async void RemoveAsync(Guid id)
+        {
+            var parentsection = await GetParentSectionofQuestion(id);
+            var questionset = parentsection.QuestionSets
+                .FirstOrDefault(x => x.Questions.Any(x => x.Id == id));
+            var question = questionset.Questions.FirstOrDefault(x => x.Id == id);
+            questionset.Questions.Remove(question);
+            Context.AddCommand(() => _sections.ReplaceOneAsync(x => x.Id == parentsection.Id, parentsection));
+        }
+
+        public override async void UpdateAsync(Question obj)
+        {
+            var parentsection = await GetParentSectionofQuestion(obj.Id);
+            var questionset = parentsection.QuestionSets
+                .FirstOrDefault(x => x.Questions.Any(x => x.Id == obj.Id));
+            var question = questionset.Questions.FirstOrDefault(x => x.Id == obj.Id);
+            _mapper.Map(obj, question);
+            Context.AddCommand(() => _sections.ReplaceOneAsync(x => x.Id == parentsection.Id, parentsection));
         }
 
         public async Task AddtoQuestionSet(Guid questionsetId, Question question)
@@ -75,7 +151,7 @@ namespace CrackerProject.API.Repository
         {
             var parentsection = await GetParentSectionofQuestionSet(questionsetId);
             var questionset = parentsection.QuestionSets.FirstOrDefault(x => x.Id == questionsetId);
-            return questionset.Questions.Any(x => x.id == questionsetId);
+            return questionset.Questions.Any(x => x.Id == questionsetId);
         }
 
         public async Task MovetoQuestionSet(Guid questionId, Guid targetquestionsetId)
@@ -83,9 +159,9 @@ namespace CrackerProject.API.Repository
             var originalsection = await GetParentSectionofQuestion(questionId);
             var originalqurstionset = originalsection.QuestionSets
                 .FirstOrDefault(x => x.Questions
-                .Any(x => x.id == questionId));
+                .Any(x => x.Id == questionId));
             var question = originalqurstionset.Questions
-                .FirstOrDefault(x => x.id == questionId);
+                .FirstOrDefault(x => x.Id == questionId);
             var targetsection = originalsection;
             var targetquestionset = originalsection.QuestionSets
                 .FirstOrDefault(x => x.Id == targetquestionsetId);

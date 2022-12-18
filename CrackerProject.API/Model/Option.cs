@@ -4,7 +4,7 @@ namespace CrackerProject.API.Model
 {
     public class Option
     {
-        public int SN { get; set; }
+        public int Sn { get; set; }
 
         public string Body { get; set; }
          

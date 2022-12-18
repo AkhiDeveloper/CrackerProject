@@ -11,7 +11,7 @@ namespace CrackerProject.API.Interfaces
         void AddAsync(TModel obj);
         Task<TModel> GetById(Identifier id);
         Task<IEnumerable<TModel>> GetAll();
-        void Update(TModel obj);
+        void UpdateAsync(TModel obj);
         void RemoveAsync(Identifier id);
         Task<IList<TModel>> Find<U>(string fieldname, U fieldvalue);
         Task<IEnumerable<TModel>> Find(Expression<Func<TModel, bool>> expression);

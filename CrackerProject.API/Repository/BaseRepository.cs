@@ -48,7 +48,7 @@ namespace CrackerProject.API.Repository
             return obj;
         }
 
-        public virtual void Update(TModel obj)
+        public virtual void UpdateAsync(TModel obj)
         {
             var data = _mapper.Map<TDataModel>(obj);
             Context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TDataModel>.Filter.Eq("_id", obj.GetId()), data));

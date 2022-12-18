@@ -86,7 +86,7 @@ namespace CrackerProject.API.Controllers
             {
                 var book = await _bookRepository.GetById(id);
                 _mapper.Map(form, book);
-                _bookRepository.Update(book);
+                _bookRepository.UpdateAsync(book);
                 var issaved = await _unitOfWork.Commit();
                 if (issaved == false)
                 {

@@ -107,7 +107,7 @@ namespace CrackerProject.API.Controllers
                 //Updating Section
                 var section = await _sectionRepository.GetById(id);
                 _mapper.Map(form, section);
-                _sectionRepository.Update(section);
+                _sectionRepository.UpdateAsync(section);
 
                 //Saving Updates
                 var result = await _unitOfWork.Commit();

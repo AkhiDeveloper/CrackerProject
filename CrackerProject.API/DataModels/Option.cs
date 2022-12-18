@@ -6,7 +6,7 @@ namespace CrackerProject.API.DataModels
     { 
         [BsonElement("sn")]
         [BsonRequired]
-        public int SN { get; set; }
+        public int Sn { get; set; }
 
         [BsonElement("body")]
         [BsonRequired]

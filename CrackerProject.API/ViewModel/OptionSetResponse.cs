@@ -7,7 +7,7 @@ namespace CrackerProject.API.ViewModel
     {
         [BsonId]
         [BsonElement("sn")]
-        public int SN { get; set; }
+        public int Sn { get; set; }
 
         [BsonElement("options")]
         public IEnumerable<OptionResponse> Options { get; set; }
