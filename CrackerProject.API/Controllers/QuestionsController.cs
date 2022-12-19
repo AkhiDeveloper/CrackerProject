@@ -13,13 +13,22 @@ namespace CrackerProject.API.Controllers
     {
         private readonly IQuestionRepository _questionRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IStorageManager _storageManager;
+        private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IMapper _mapper;
 
-        public QuestionsController(IQuestionRepository questionRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        public QuestionsController(
+            IQuestionRepository questionRepository, 
+            IUnitOfWork unitOfWork, 
+            IMapper mapper, 
+            IStorageManager storageManager,
+            IWebHostEnvironment hostEnvironment)
         {
             _questionRepository = questionRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _storageManager = storageManager;
+            _hostEnvironment = hostEnvironment;
         }
 
         [HttpPost("{id}/Options")]
@@ -50,8 +59,34 @@ namespace CrackerProject.API.Controllers
             }
         }
 
+        [HttpPost("{id}/Image")]
+        public async Task<ActionResult> UploadQuestionImage(IFormFile imagefileform)
+        {
+            try
+            {
+                var filename = DateTime.UtcNow.Ticks.ToString() + "_" + imagefileform.FileName;
+                var filepath = Path.Combine(_hostEnvironment.ContentRootPath, "Image", filename);
+                using(FileStream stream = new FileStream(filepath, FileMode.Create))
+                {
+                    await imagefileform.CopyToAsync(stream);
+                    StorageDirectory imagedirectory = new StorageDirectory("Images");
+                    await _storageManager.ChangeActiveDirectory(imagedirectory);
+                    var filedirectory = _storageManager.UploadFile(stream, new CancellationToken());
+                    if(filedirectory == null)
+                    {
+                        return BadRequest("Failed to Upload Image.");
+                    }
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateQuestion(Guid id, [FromForm] QuestionForm form)
+        public async Task<ActionResult> UpdateQuestion(Guid id, [FromBody] QuestionForm form)
         {
             try
             {

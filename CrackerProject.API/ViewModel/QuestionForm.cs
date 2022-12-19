@@ -10,8 +10,6 @@ namespace CrackerProject.API.ViewModel
         [Required]
         public int Sn { get; set; } = 1;
 
-        public IFormFile? ImageFile { get; set; }
-
         [Required]
         public string Body { get; set; } = String.Empty;
     }
