@@ -1,9 +1,10 @@
-﻿using CrackerProject.API.Model;
+﻿using DataModel = CrackerProject.API.Data.MongoDb.SchemaOne.Model;
+using CrackerProject.API.Model;
 using System.Linq.Expressions;
 
 namespace CrackerProject.API.Interfaces
 {
-    public interface ISectionRepository : IRepository<Section, DataModels.Section,Guid>
+    public interface ISectionRepository : IRepository<Section, DataModel.Section,Guid>
     {
         //Relation to Book
         Task AddtoBook(Guid bookid, Section section);

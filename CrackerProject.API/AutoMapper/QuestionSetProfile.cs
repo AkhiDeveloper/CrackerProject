@@ -8,8 +8,8 @@ namespace CrackerProject.API.AutoMapper
         public QuestionSetProfile()
         {
             //QuestionSet
-            CreateMap<Model.QuestionSet, DataModels.QuestionSet>();
-            CreateMap<DataModels.QuestionSet, Model.QuestionSet>();
+            CreateMap<Model.QuestionSet, Data.MongoDb.SchemaOne.Model.QuestionSet>();
+            CreateMap<Data.MongoDb.SchemaOne.Model.QuestionSet, Model.QuestionSet>();
             CreateMap<Model.QuestionSet, ViewModel.QuestionSetResponse>();
             CreateMap<ViewModel.QuestionSetForm, Model.QuestionSet>();
         }

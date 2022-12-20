@@ -6,7 +6,7 @@ using Firebase.Storage;
 using ServiceStack.Messaging;
 using Setting = CrackerProject.API.Settings;
 
-namespace CrackerProject.API.Repository
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {
     public class FirebaseStorageManager : IStorageManager
     {
@@ -29,16 +29,16 @@ namespace CrackerProject.API.Repository
 
         private FirebaseStorageReference GetFirebaseStorageRefrence(StorageDirectory? directory = null, FirebaseStorage? storage = null)
         {
-            if(storage == null)
+            if (storage == null)
             {
                 storage = _storage;
             }
-            if(directory == null)
+            if (directory == null)
             {
                 directory = new StorageDirectory(_masterfolder);
             }
             FirebaseStorageReference storageReference;
-            if(directory.GetParentDirectory() != null)
+            if (directory.GetParentDirectory() != null)
             {
                 storageReference = storage.Child(directory.Name);
                 return storageReference;
@@ -68,7 +68,7 @@ namespace CrackerProject.API.Repository
             var task = await storageRef
                 .Child(filename)
                 .PutAsync(fileStream, cancellationToken);
-            if(task == null)
+            if (task == null)
             {
                 throw new Exception("Failed to Upload File.");
             }

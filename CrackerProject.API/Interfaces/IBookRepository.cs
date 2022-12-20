@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace CrackerProject.API.Interfaces
 {
-    public interface IBookRepository : IRepository<Model.Book, DataModels.Book, Guid>
+    public interface IBookRepository : IRepository<Model.Book, Data.MongoDb.SchemaOne.Model.Book, Guid>
     {
        
     }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DataModel = CrackerProject.API.Data.MongoDb.SchemaOne.Model;
 using CrackerProject.API.Interfaces;
 using CrackerProject.API.Model;
 using Humanizer;
@@ -6,18 +7,18 @@ using MongoDB.Driver;
 using ServiceStack;
 using System.Linq.Expressions;
 
-namespace CrackerProject.API.Repository
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {
-    public class QuestionSetRepository : BaseRepository<QuestionSet, DataModels.QuestionSet,Guid>, IQuestionSetRepository
+    public class QuestionSetRepository : BaseRepository<QuestionSet, DataModel.QuestionSet, Guid>, IQuestionSetRepository
     {
-        private readonly IMongoCollection<DataModels.Section> _sections;
+        private readonly IMongoCollection<Model.Section> _sections;
         public QuestionSetRepository(IMongoContext context, IMapper mapper) : base(context, mapper)
         {
-            _sections = Context.GetCollection<DataModels.Section>
-                (nameof(DataModels.Section).Pluralize());
+            _sections = Context.GetCollection<Model.Section>
+                (nameof(Model.Section).Pluralize());
         }
 
-        private async Task<DataModels.Section> GetParentSection(Guid questionset_id)
+        private async Task<Model.Section> GetParentSection(Guid questionset_id)
         {
             var originsectioncursor = await _sections.FindAsync(x =>
             x.QuestionSets.Any(q =>
@@ -60,7 +61,7 @@ namespace CrackerProject.API.Repository
         {
             var parentsectiondata = await GetParentSection(id);
             var questionsetdata = parentsectiondata.QuestionSets.FirstOrDefault(x => x.Id == id);
-            var questionset = _mapper.Map<Model.QuestionSet>(questionsetdata);
+            var questionset = _mapper.Map<QuestionSet>(questionsetdata);
             return questionset;
         }
 
@@ -81,15 +82,15 @@ namespace CrackerProject.API.Repository
         {
             var sectioncursor = await _sections.FindAsync(x => x.Id == sectionid);
             var section = sectioncursor.FirstOrDefault();
-            if(section == null)
+            if (section == null)
             {
                 throw new NullReferenceException
                     ("Section with id ={id} is not found.");
             }
-            var questionsetdata = _mapper.Map<DataModels.QuestionSet>(questionset);
-            if(section.QuestionSets == null)
+            var questionsetdata = _mapper.Map<Model.QuestionSet>(questionset);
+            if (section.QuestionSets == null)
             {
-                section.QuestionSets = new List<DataModels.QuestionSet>();
+                section.QuestionSets = new List<Model.QuestionSet>();
             }
             section.QuestionSets.Add(questionsetdata);
             Context.AddCommand(() => _sections.ReplaceOneAsync(x => x.Id == sectionid, section));
@@ -123,7 +124,7 @@ namespace CrackerProject.API.Repository
                 throw new NullReferenceException
                     ($"Section with id ={sectionid} is not found.");
             }
-            var isexist=section.QuestionSets.Any(x=>x.Id == questionset_id);
+            var isexist = section.QuestionSets.Any(x => x.Id == questionset_id);
             return isexist;
         }
 
@@ -136,16 +137,16 @@ namespace CrackerProject.API.Repository
                 throw new NullReferenceException
                     ($"Target Section with id ={section_id} is not found.");
             }
-            if(targetsection.QuestionSets.Any(x=>x.Id == questionset_id))
+            if (targetsection.QuestionSets.Any(x => x.Id == questionset_id))
             {
                 return;
             }
-            
+
             var originsection = await GetParentSection(questionset_id);
 
             var questionsetdata = originsection.QuestionSets
                 .FirstOrDefault(x => x.Id == questionset_id);
-            if(!originsection.QuestionSets.Remove(questionsetdata))
+            if (!originsection.QuestionSets.Remove(questionsetdata))
             {
                 throw new NullReferenceException
                     ($"Questionset with id ={questionset_id} is not found.");

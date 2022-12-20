@@ -1,13 +1,13 @@
-using CrackerProject.API.Context;
 using CrackerProject.API.Interfaces;
-using CrackerProject.API.Persistence;
-using CrackerProject.API.Repository;
 using CrackerProject.API.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.GenericRepository.UoW;
 using AutoMapper.Extensions.ExpressionMapping;
 using AutoMapper;
+using CrackerProject.API.Data.MongoDb.SchemaOne.Repository;
+using CrackerProject.API.Data.MongoDb;
+using CrackerProject.API.Data.MongoDb.SchemaOne.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

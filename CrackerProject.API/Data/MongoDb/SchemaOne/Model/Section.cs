@@ -1,10 +1,9 @@
-﻿using CrackerProject.API.DataModels;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.DataModels
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Model
 {
     [BsonDiscriminator(RootClass = true)]
-    [BsonKnownTypes(typeof(BookSection) , typeof(SubSection))]
+    [BsonKnownTypes(typeof(BookSection), typeof(SubSection))]
     public class Section
     {
         [BsonId]

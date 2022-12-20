@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
-namespace CrackerProject.API.DataModels
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Model
 {
     [BsonIgnoreExtraElements]
     public class Book
@@ -14,13 +14,13 @@ namespace CrackerProject.API.DataModels
         public string Name { get; set; }
 
         [BsonElement("description")]
-        public string Description { get; set; } = String.Empty;
+        public string Description { get; set; } = string.Empty;
 
         [BsonElement("createdDateTime")]
-        public DateTime CreatedDateTime { get; set; } =DateTime.UtcNow;
+        public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
 
         [BsonElement("publisher")]
-        public string Publisher { get; set; } =string.Empty;
+        public string Publisher { get; set; } = string.Empty;
 
         [BsonElement("writer")]
         public string author { get; set; } = string.Empty;

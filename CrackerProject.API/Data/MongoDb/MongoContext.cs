@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CrackerProject.API.Settings;
 
-namespace CrackerProject.API.Context
+namespace CrackerProject.API.Data.MongoDb
 {
     public class MongoContext : IMongoContext
     {
@@ -29,14 +29,14 @@ namespace CrackerProject.API.Context
         public async Task<int> SaveChanges()
         {
             ConfigureMongo();
-            
+
             using (Session = await MongoClient.StartSessionAsync())
             {
                 try
                 {
                     Session.StartTransaction();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                     Console.WriteLine(ex.ToString());
@@ -49,7 +49,7 @@ namespace CrackerProject.API.Context
                 {
                     await Session.CommitTransactionAsync();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
 

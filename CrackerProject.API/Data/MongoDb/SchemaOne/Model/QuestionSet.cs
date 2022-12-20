@@ -1,7 +1,6 @@
-﻿using CrackerProject.API.DataModels;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.DataModels
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Model
 {
     public class QuestionSet
     {
@@ -12,7 +11,7 @@ namespace CrackerProject.API.DataModels
         public int Sn { get; set; }
 
         [BsonElement("description")]
-        public string Description { get; set; } = String.Empty;
+        public string Description { get; set; } = string.Empty;
 
         [BsonElement("added_date")]
         public DateTime AddedDate { get; set; } = DateTime.UtcNow;

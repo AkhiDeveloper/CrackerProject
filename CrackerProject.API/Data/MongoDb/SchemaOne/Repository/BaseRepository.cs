@@ -10,9 +10,9 @@ using Humanizer;
 using System.Linq.Expressions;
 using AutoMapper;
 
-namespace CrackerProject.API.Repository
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {
-    public abstract class BaseRepository<TModel, TDataModel, TIdentifier> 
+    public abstract class BaseRepository<TModel, TDataModel, TIdentifier>
         : IRepository<TModel, TDataModel, TIdentifier> where TModel : class where TDataModel : class
     {
         protected readonly IMapper _mapper;
@@ -61,7 +61,7 @@ namespace CrackerProject.API.Repository
 
         public virtual async Task<IList<TModel>> Find<U>(string fieldname, U fieldvalue)
         {
-            var result = await DbSet.FindAsync(Builders<TDataModel>.Filter.Eq(fieldname,fieldvalue));
+            var result = await DbSet.FindAsync(Builders<TDataModel>.Filter.Eq(fieldname, fieldvalue));
             return _mapper.Map<IList<TModel>>(result.ToList());
         }
 
@@ -83,7 +83,7 @@ namespace CrackerProject.API.Repository
         {
             var cursor = await DbSet.FindAsync<TDataModel>(Builders<TDataModel>.Filter.Eq("_id", id));
             var result = await cursor.ToListAsync();
-            if(result.Count < 1) return false;
+            if (result.Count < 1) return false;
             return true;
         }
     }

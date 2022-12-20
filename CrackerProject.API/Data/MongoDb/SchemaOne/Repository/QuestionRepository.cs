@@ -4,26 +4,27 @@ using AutoMapper;
 using System.Linq.Expressions;
 using MongoDB.Driver;
 using Humanizer;
+using DataModel = CrackerProject.API.Data.MongoDb.SchemaOne.Model;
 
-namespace CrackerProject.API.Repository
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {
-    public class QuestionRepository : BaseRepository<Question,DataModels.Question,Guid>, IQuestionRepository
+    public class QuestionRepository : BaseRepository<Question, DataModel.Question, Guid>, IQuestionRepository
     {
-        private readonly IMongoCollection<DataModels.Section> _sections;
-        public QuestionRepository(IMongoContext context, IMapper mapper) : base(context,mapper)
+        private readonly IMongoCollection<Model.Section> _sections;
+        public QuestionRepository(IMongoContext context, IMapper mapper) : base(context, mapper)
         {
-            _sections = Context.GetCollection<DataModels.Section>
-                (nameof(DataModels.Section).Pluralize());
+            _sections = Context.GetCollection<Model.Section>
+                (nameof(DataModel.Section).Pluralize());
         }
 
-        private async Task<DataModels.Section> GetParentSectionofQuestion(Guid question_id)
+        private async Task<DataModel.Section> GetParentSectionofQuestion(Guid question_id)
         {
             var parentsectioncursor = await _sections.FindAsync(s =>
             s.QuestionSets.Any(qs =>
             qs.Questions.Any(q =>
             q.Id == question_id)));
             var parentsection = parentsectioncursor.FirstOrDefault();
-            if(parentsection == null)
+            if (parentsection == null)
             {
                 throw new NullReferenceException
                     ($"Question with id ={question_id} is not found.");
@@ -31,7 +32,7 @@ namespace CrackerProject.API.Repository
             return parentsection;
         }
 
-        private async Task<DataModels.Section> GetParentSectionofQuestionSet(Guid questionset_id)
+        private async Task<DataModel.Section> GetParentSectionofQuestionSet(Guid questionset_id)
         {
             var originsectioncursor = await _sections.FindAsync(x =>
             x.QuestionSets.Any(q =>
@@ -53,9 +54,9 @@ namespace CrackerProject.API.Repository
         public override async Task<IEnumerable<Question>> Find(Expression<Func<Question, bool>> expression)
         {
             var questions = new List<Question>();
-            var dataexpression = _mapper.Map<Expression<Func<DataModels.Question, bool>>>(expression);
+            var dataexpression = _mapper.Map<Expression<Func<Model.Question, bool>>>(expression);
             var sectioncursors = await _sections
-                .FindAsync(s=>s.QuestionSets
+                .FindAsync(s => s.QuestionSets
                 .Any(qs => qs.Questions
                 .Any(dataexpression.Compile())));
             var sections = sectioncursors.ToList();
@@ -78,11 +79,11 @@ namespace CrackerProject.API.Repository
         public override async Task<IEnumerable<Question>> GetAll()
         {
             var questions = new List<Question>();
-            var sectioncursors = await _sections.FindAsync(Builders<DataModels.Section>.Filter.Empty);
+            var sectioncursors = await _sections.FindAsync(Builders<Model.Section>.Filter.Empty);
             var sections = sectioncursors.ToList();
-            foreach(var section in sections)
+            foreach (var section in sections)
             {
-                foreach(var questionset in section.QuestionSets)
+                foreach (var questionset in section.QuestionSets)
                 {
                     questions.AddRange(_mapper
                         .Map<IEnumerable<Question>>(questionset.Questions));
@@ -125,7 +126,7 @@ namespace CrackerProject.API.Repository
         {
             var targetsection = await GetParentSectionofQuestionSet(questionsetId);
             var questionset = targetsection.QuestionSets.FirstOrDefault(x => x.Id == questionsetId);
-            var questiondata = _mapper.Map<DataModels.Question>(question);
+            var questiondata = _mapper.Map<Model.Question>(question);
             questionset.Questions.Add(questiondata);
             Context.AddCommand(() => _sections
             .ReplaceOneAsync(x => x.Id == targetsection.Id, targetsection));
@@ -134,7 +135,7 @@ namespace CrackerProject.API.Repository
         public async Task<IEnumerable<Question>> GetfromQuestionSet(Guid questionsetId)
         {
             var parentsection = await GetParentSectionofQuestionSet(questionsetId);
-            var questionset=parentsection.QuestionSets.FirstOrDefault(x=>x.Id== questionsetId);
+            var questionset = parentsection.QuestionSets.FirstOrDefault(x => x.Id == questionsetId);
             var questionmodels = _mapper.Map<IEnumerable<Question>>(questionset.Questions);
             return questionmodels;
         }
@@ -165,7 +166,7 @@ namespace CrackerProject.API.Repository
             var targetsection = originalsection;
             var targetquestionset = originalsection.QuestionSets
                 .FirstOrDefault(x => x.Id == targetquestionsetId);
-            if(targetquestionset == null)
+            if (targetquestionset == null)
             {
                 targetsection = await GetParentSectionofQuestionSet(targetquestionsetId);
                 targetquestionset = targetsection.QuestionSets
@@ -175,12 +176,12 @@ namespace CrackerProject.API.Repository
             targetquestionset.Questions.Add(question);
             Context.AddCommand(() => _sections
             .ReplaceOneAsync(x => x.Id == originalsection.Id, originalsection));
-            if(targetsection == originalsection)
+            if (targetsection == originalsection)
             {
                 Context.AddCommand(() => _sections
                 .ReplaceOneAsync(x => x.Id == targetsection.Id, targetsection));
             }
-            
+
 
         }
     }

@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 
-namespace CrackerProject.API.Persistence
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Persistence
 {
     public static class MongoDbPersistence
     {

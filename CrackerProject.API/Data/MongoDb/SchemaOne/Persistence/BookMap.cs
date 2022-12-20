@@ -1,8 +1,7 @@
-﻿
-using CrackerProject.API.DataModels;
+﻿using CrackerProject.API.Data.MongoDb.SchemaOne.Model;
 using MongoDB.Bson.Serialization;
 
-namespace CrackerProject.API.Persistence
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Persistence
 {
     public class BookMap
     {

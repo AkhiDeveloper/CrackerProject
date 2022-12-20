@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.DataModels
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Model
 {
     public class SubSection : Section
     {

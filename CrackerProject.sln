@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackerProject.API", "Crack
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackerProject.UnitTesting", "CrackerProject.UnitTesting\CrackerProject.UnitTesting.csproj", "{73D389EA-82C5-48A7-B0D9-2F1A210806A2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrackerProject.Library", "CrackerProject.Library\CrackerProject.Library.csproj", "{1CA84A8A-59A6-4498-98DC-829BCE7566B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrackerProject.Console", "CrackerProject.Console\CrackerProject.Console.csproj", "{66295FBF-393E-4F2C-BCA4-66D50DD34346}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{73D389EA-82C5-48A7-B0D9-2F1A210806A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73D389EA-82C5-48A7-B0D9-2F1A210806A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73D389EA-82C5-48A7-B0D9-2F1A210806A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CA84A8A-59A6-4498-98DC-829BCE7566B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CA84A8A-59A6-4498-98DC-829BCE7566B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CA84A8A-59A6-4498-98DC-829BCE7566B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CA84A8A-59A6-4498-98DC-829BCE7566B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66295FBF-393E-4F2C-BCA4-66D50DD34346}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66295FBF-393E-4F2C-BCA4-66D50DD34346}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66295FBF-393E-4F2C-BCA4-66D50DD34346}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66295FBF-393E-4F2C-BCA4-66D50DD34346}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

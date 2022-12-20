@@ -1,8 +1,8 @@
 ﻿using CrackerProject.API.Interfaces;
-using CrackerProject.API.Repository;
+using CrackerProject.API.Data.MongoDb.SchemaOne.Repository;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.DataModels
+namespace CrackerProject.API.Data.MongoDb.SchemaOne.Model
 {
     public class Question
     {
@@ -15,7 +15,7 @@ namespace CrackerProject.API.DataModels
 
         [BsonElement("body")]
         [BsonRequired]
-        public string Body { get; set; } = String.Empty;
+        public string Body { get; set; } = string.Empty;
 
         [BsonElement("imageUri")]
         public string? ImageUri { get; set; } = null;
