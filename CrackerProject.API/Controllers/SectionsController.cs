@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CrackerProject.API.Interfaces;
-using CrackerProject.API.Model;
+using CrackerProject.API.Model.Book;
 using CrackerProject.API.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

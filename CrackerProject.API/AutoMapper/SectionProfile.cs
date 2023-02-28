@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using CrackerProject.API.Data.MongoDb.SchemaOne.Model;
-using CrackerProject.API.Model;
 
 namespace CrackerProject.API.AutoMapper
 {
@@ -9,12 +8,12 @@ namespace CrackerProject.API.AutoMapper
         public SectionProfile()
         {
             //Section
-            CreateMap<Model.Section, Data.MongoDb.SchemaOne.Model.Section>();
-            CreateMap<Model.Section, BookSection>().ReverseMap();
-            CreateMap<Model.Section, SubSection>().ReverseMap();
-            CreateMap<Data.MongoDb.SchemaOne.Model.Section, Model.Section>();
-            CreateMap<Model.Section, ViewModel.SectionResponse>();
-            CreateMap<ViewModel.SectionCreationForm, Model.Section>();
+            CreateMap<Model.Book.Section, Data.MongoDb.SchemaOne.Model.Section>();
+            CreateMap<Model.Book.Section, BookSection>().ReverseMap();
+            CreateMap<Model.Book.Section, SubSection>().ReverseMap();
+            CreateMap<Data.MongoDb.SchemaOne.Model.Section, Model.Book.Section>();
+            CreateMap<Model.Book.Section, ViewModel.SectionResponse>();
+            CreateMap<ViewModel.SectionCreationForm, Model.Book.Section>();
 
         }
     }

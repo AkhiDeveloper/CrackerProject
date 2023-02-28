@@ -13,7 +13,7 @@ using AutoMapper;
 namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {
     public abstract class BaseRepository<TModel, TDataModel, TIdentifier>
-        : IRepository<TModel, TDataModel, TIdentifier> where TModel : class where TDataModel : class
+        : IRepository<TModel, TIdentifier> where TModel : class where TDataModel : class
     {
         protected readonly IMapper _mapper;
         protected readonly IMongoContext Context;

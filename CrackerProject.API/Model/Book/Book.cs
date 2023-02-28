@@ -1,4 +1,4 @@
-﻿namespace CrackerProject.API.Model
+﻿namespace CrackerProject.API.Model.Book
 {
     public class Book
     {
@@ -6,7 +6,7 @@
 
         public string Name { get; set; }
 
-        public string Description { get; set; } = String.Empty;
+        public string Description { get; set; } = string.Empty;
 
         public DateTime CreatedDateTime { get; set; } = DateTime.UtcNow;
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CrackerProject.API.Interfaces;
-using CrackerProject.API.Model;
+using CrackerProject.API.Model.Book;
 using CrackerProject.API.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +48,7 @@ namespace CrackerProject.API.Controllers
         {
             try
             {
-                var questionmodel = _mapper.Map<Model.Question>(questionForm);
+                var questionmodel = _mapper.Map<Question>(questionForm);
                 await _questionRepository.AddtoQuestionSet(id, questionmodel);
                 var issaved = await _unitOfWork.Commit();
                 if(issaved == false)

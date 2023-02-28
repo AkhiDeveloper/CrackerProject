@@ -8,6 +8,7 @@ using AutoMapper;
 using CrackerProject.API.Data.MongoDb.SchemaOne.Repository;
 using CrackerProject.API.Data.MongoDb;
 using CrackerProject.API.Data.MongoDb.SchemaOne.Persistence;
+using CrackerProject.API.Data.Firebase.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,8 @@ builder.Services.AddScoped<ISectionRepository, SectionRepository>();
 builder.Services.AddScoped<IQuestionSetRepository, QuestionSetRepository>();
 builder.Services.AddScoped<IStorageManager, FirebaseStorageManager>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
 //Adding Automapper Service
 builder.Services.AddAutoMapper(cfg =>

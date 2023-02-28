@@ -1,10 +1,10 @@
 ﻿using DataModel = CrackerProject.API.Data.MongoDb.SchemaOne.Model;
-using CrackerProject.API.Model;
 using System.Linq.Expressions;
+using CrackerProject.API.Model.Book;
 
 namespace CrackerProject.API.Interfaces
 {
-    public interface IQuestionSetRepository : IRepository<QuestionSet, DataModel.QuestionSet, Guid>
+    public interface IQuestionSetRepository : IRepository<QuestionSet, Guid>
     {
         //Section
         Task AddtoSection(Guid sectionid, QuestionSet questionset);
@@ -13,5 +13,7 @@ namespace CrackerProject.API.Interfaces
         Task<IEnumerable<QuestionSet>> GetfromSection(Guid sectionid, Expression<Func<Section, bool>> predicate);
         Task RemoveSectionQuestionSets(Guid sectionid, DeleteType deleteType);
         Task<bool> IsExistInSection(Guid sectionid, Guid questionset_id);
+
+        
     }
 }

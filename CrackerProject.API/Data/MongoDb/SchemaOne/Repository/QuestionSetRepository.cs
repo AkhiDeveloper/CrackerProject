@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using DataModel = CrackerProject.API.Data.MongoDb.SchemaOne.Model;
 using CrackerProject.API.Interfaces;
-using CrackerProject.API.Model;
 using Humanizer;
 using MongoDB.Driver;
 using ServiceStack;
 using System.Linq.Expressions;
+using CrackerProject.API.Model.Book;
 
 namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {

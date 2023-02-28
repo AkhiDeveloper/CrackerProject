@@ -1,7 +1,6 @@
-﻿
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.Model
+namespace CrackerProject.API.Model.Book
 {
     public class Question
     {
@@ -9,7 +8,7 @@ namespace CrackerProject.API.Model
 
         public int Sn { get; set; } = 1;
 
-        public string Body { get; set; } = String.Empty;
+        public string Body { get; set; } = string.Empty;
 
         public string? ImagePath { get; set; } = null;
 

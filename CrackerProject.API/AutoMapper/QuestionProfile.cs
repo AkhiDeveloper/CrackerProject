@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CrackerProject.API.Model;
+using CrackerProject.API.Model.Book;
 
 namespace CrackerProject.API.AutoMapper
 {
@@ -8,14 +8,14 @@ namespace CrackerProject.API.AutoMapper
         public QuestionProfile()
         {
             //Question
-            CreateMap<Model.Question, Data.MongoDb.SchemaOne.Model.Question>();
-            CreateMap<Data.MongoDb.SchemaOne.Model.Question, Model.Question>();
-            CreateMap<Model.Question, ViewModel.QuestionResponse>();
-            CreateMap<ViewModel.QuestionForm, Model.Question>();
-            CreateMap<ViewModel.OptionForm, Model.Option>();
-            CreateMap<Model.Option, ViewModel.OptionResponse>();
-            CreateMap<Model.Option, Data.MongoDb.SchemaOne.Model.Option>().ReverseMap();  
-            CreateMap<Model.OptionSet, Data.MongoDb.SchemaOne.Model.OptionSet>().ReverseMap();
+            CreateMap<Question, Data.MongoDb.SchemaOne.Model.Question>();
+            CreateMap<Data.MongoDb.SchemaOne.Model.Question, Question>();
+            CreateMap<Question, ViewModel.QuestionResponse>();
+            CreateMap<ViewModel.QuestionForm, Question>();
+            CreateMap<ViewModel.OptionForm, Option>();
+            CreateMap<Option, ViewModel.OptionResponse>();
+            CreateMap<Option, Data.MongoDb.SchemaOne.Model.Option>().ReverseMap();  
+            CreateMap<OptionSet, Data.MongoDb.SchemaOne.Model.OptionSet>().ReverseMap();
         }
     }
 }

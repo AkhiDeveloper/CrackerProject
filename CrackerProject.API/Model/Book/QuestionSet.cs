@@ -1,7 +1,6 @@
-﻿
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace CrackerProject.API.Model
+namespace CrackerProject.API.Model.Book
 {
     public class QuestionSet
     {
@@ -9,7 +8,7 @@ namespace CrackerProject.API.Model
 
         public int Sn { get; set; }
 
-        public string Description { get; set; } = String.Empty;
+        public string Description { get; set; } = string.Empty;
 
         public DateTime AddedDate { get; set; } = DateTime.UtcNow;
     }

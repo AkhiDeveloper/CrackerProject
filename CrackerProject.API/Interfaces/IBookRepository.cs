@@ -1,9 +1,9 @@
-﻿using CrackerProject.API.Model;
+﻿using CrackerProject.API.Model.Book;
 using System.Linq.Expressions;
 
 namespace CrackerProject.API.Interfaces
 {
-    public interface IBookRepository : IRepository<Model.Book, Data.MongoDb.SchemaOne.Model.Book, Guid>
+    public interface IBookRepository : IRepository<Book, Guid>
     {
        
     }

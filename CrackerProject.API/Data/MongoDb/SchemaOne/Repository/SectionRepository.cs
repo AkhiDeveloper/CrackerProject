@@ -1,5 +1,4 @@
-﻿using CrackerProject.API.Model;
-using CrackerProject.API.Interfaces;
+﻿using CrackerProject.API.Interfaces;
 using ServiceStack;
 using AutoMapper;
 using System.Linq.Expressions;
@@ -7,6 +6,7 @@ using MongoDB.Driver;
 using Humanizer;
 using MongoDB.Driver.Linq;
 using DataModel = CrackerProject.API.Data.MongoDb.SchemaOne.Model;
+using CrackerProject.API.Model.Book;
 
 namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {
@@ -50,11 +50,9 @@ namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 
         public async Task<IEnumerable<Section>> GetfromBook(Guid bookid, Expression<Func<Section, bool>> predicate)
         {
-            var dataexp = _mapper.Map<Expression<Func<DataModel.BookSection, bool>>>(predicate);
-            Expression<Func<DataModel.BookSection, bool>> idexp = x => x.BookId == bookid;
-            var combineexp = Expression.Lambda<Func<DataModel.BookSection, bool>>
-                (Expression.AndAlso(idexp, dataexp));
-            var cursor = await _booksectionSet.FindAsync(x => x.BookId == bookid);
+            var dataexp = _mapper.Map<Expression<Func<DataModel.BookSection, bool>>>(predicate).Compile();
+            Func<DataModel.BookSection, bool> idexp = x => x.BookId == bookid;
+            var cursor = await _booksectionSet.FindAsync(x => dataexp(x) && idexp(x));
             var data = cursor.ToEnumerable();
             var objs = _mapper.Map<IEnumerable<Section>>(data);
             return objs;

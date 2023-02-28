@@ -1,12 +1,12 @@
 ﻿using CrackerProject.API.Interfaces;
 using CrackerProject.API.Model;
 using CrackerProject.API.Settings;
-using Firebase.Auth;
+using firebaseauth = Firebase.Auth;
 using Firebase.Storage;
 using ServiceStack.Messaging;
 using Setting = CrackerProject.API.Settings;
 
-namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
+namespace CrackerProject.API.Data.Firebase.Storage
 {
     public class FirebaseStorageManager : IStorageManager
     {
@@ -16,7 +16,7 @@ namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 
         public FirebaseStorageManager(Setting.FirebaseConfig config)
         {
-            var auth = new FirebaseAuthProvider(new Firebase.Auth.FirebaseConfig(config.ApiKey));
+            var auth = new firebaseauth.FirebaseAuthProvider(new firebaseauth.FirebaseConfig(config.ApiKey));
             var a = auth.SignInWithEmailAndPasswordAsync(config.EmailId, config.Password).Result;
             var cancellation = new CancellationTokenSource();
             _storage = new FirebaseStorage(config.StorageBucket,

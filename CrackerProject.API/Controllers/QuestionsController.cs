@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CrackerProject.API.Interfaces;
 using CrackerProject.API.Model;
+using CrackerProject.API.Model.Book;
 using CrackerProject.API.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,7 @@ namespace CrackerProject.API.Controllers
             try
             {
                 var questionmodel = await _questionRepository.GetById(id);
-                var optionmodels = _mapper.Map<IList<Model.Option>>(options);
+                var optionmodels = _mapper.Map<IList<Option>>(options);
                 if (questionmodel.OptionSets == null)
                 {
                     questionmodel.OptionSets = new List<OptionSet>();
@@ -136,7 +137,7 @@ namespace CrackerProject.API.Controllers
                     return BadRequest("Optionset is not found.");
                 }
                 optionset.Options.Clear();
-                var optionmodels = _mapper.Map<IList<Model.Option>>(options);
+                var optionmodels = _mapper.Map<IList<Option>>(options);
                 foreach (var option in optionmodels)
                 {
                     optionset.Options.Add(option);

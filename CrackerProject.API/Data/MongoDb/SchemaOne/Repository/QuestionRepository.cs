@@ -1,20 +1,24 @@
-﻿using CrackerProject.API.Model;
-using CrackerProject.API.Interfaces;
+﻿using CrackerProject.API.Interfaces;
 using AutoMapper;
 using System.Linq.Expressions;
 using MongoDB.Driver;
 using Humanizer;
 using DataModel = CrackerProject.API.Data.MongoDb.SchemaOne.Model;
+using CrackerProject.API.Model.Book;
+using ServiceStack;
 
 namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {
     public class QuestionRepository : BaseRepository<Question, DataModel.Question, Guid>, IQuestionRepository
     {
-        private readonly IMongoCollection<Model.Section> _sections;
+        private readonly IMongoCollection<DataModel.Section> _sections;
+        private readonly IMongoCollection<DataModel.Chapter> _chapters;
         public QuestionRepository(IMongoContext context, IMapper mapper) : base(context, mapper)
         {
-            _sections = Context.GetCollection<Model.Section>
+            _sections = Context.GetCollection<DataModel.Section>
                 (nameof(DataModel.Section).Pluralize());
+            _chapters = Context.GetCollection<DataModel.Chapter>
+                (nameof(DataModel.Chapter).Pluralize());
         }
 
         private async Task<DataModel.Section> GetParentSectionofQuestion(Guid question_id)
@@ -183,6 +187,70 @@ namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
             }
 
 
+        }
+
+        public async Task AssignSectionQuestionstoChapter(Guid chapter_id, Guid section_id)
+        {
+            var chaptercursor = await _chapters.FindAsync(x => x.Id == chapter_id);
+            var chapter = await chaptercursor.FirstOrDefaultAsync();
+            if (chapter == null)
+                throw new NullReferenceException($"Chapter with Id = {chapter_id} is not found.");
+            if(!await _sections.Find(x=>x.Id==section_id).AnyAsync())
+                throw new NullReferenceException($"Section with Id = {section_id} is not found.");
+            chapter.AssociatedSectionIds.Add(section_id);
+            Context.AddCommand(() => _chapters.ReplaceOneAsync(x => x.Id == chapter_id, chapter));
+        }
+
+        public async Task<IEnumerable<Question>> GetChapterQuestions(Guid chapter_id)
+        {
+            var chaptercursor = await _chapters.FindAsync(x => x.Id == chapter_id);
+            var chapter = await chaptercursor.FirstOrDefaultAsync();
+            if (chapter == null)
+                throw new NullReferenceException($"Chapter with Id = {chapter_id} is not found.");
+            List<DataModel.Question> answer = new List<DataModel.Question>();
+            foreach(var sectionid in chapter.AssociatedSectionIds)
+            {
+                var section = await _sections.FindAsync(x => x.Id == sectionid).Result.FirstOrDefaultAsync();
+                foreach(var questionset in section.QuestionSets)
+                {
+                    answer.AddRange(questionset.Questions);
+                }
+            }
+            return _mapper.Map<IEnumerable<Question>>(answer);
+        }
+
+        public async Task<IEnumerable<Question>> GetChapterQuestions(Guid chapter_id, Expression<Func<Question, bool>> predicate)
+        {
+            var predicatedata = _mapper.Map<Expression<Func<DataModel.Question, bool>>>(predicate);
+            var chaptercursor = await _chapters.FindAsync(x => x.Id == chapter_id);
+            var chapter = await chaptercursor.FirstOrDefaultAsync();
+            if (chapter == null)
+                throw new NullReferenceException($"Chapter with Id = {chapter_id} is not found.");
+            List<DataModel.Question> answer = new List<DataModel.Question>();
+            foreach (var sectionid in chapter.AssociatedSectionIds)
+            {
+                var section = await _sections.FindAsync(x => x.Id == sectionid).Result.FirstOrDefaultAsync();
+                foreach (var questionset in section.QuestionSets)
+                {
+                    answer.AddRange(questionset.Questions.AsQueryable().Where(predicatedata));
+                }
+            }
+            return _mapper.Map<IEnumerable<Question>>(answer);
+        }
+
+        public async Task UnAssignSectionQuestionfromChapter(Guid chapter_id, Guid section_id)
+        {
+            var chaptercursor = await _chapters.FindAsync(x => x.Id == chapter_id);
+            var chapter = await chaptercursor.FirstOrDefaultAsync();
+            if (chapter == null)
+                throw new NullReferenceException($"Chapter with Id = {chapter_id} is not found.");
+            chapter.AssociatedSectionIds.Remove(section_id);
+            Context.AddCommand(() => _chapters.ReplaceOneAsync(x => x.Id == chapter_id, chapter));
+        }
+
+        public Task<IEnumerable<Guid>> GetChapterQuestionIds(Guid chapter_id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

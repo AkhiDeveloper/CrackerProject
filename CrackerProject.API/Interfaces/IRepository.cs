@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CrackerProject.API.Interfaces
 {
-    public interface IRepository<TModel, TDataModel, Identifier> : IDisposable where TModel : class where TDataModel:class
+    public interface IRepository<TModel, Identifier> : IDisposable where TModel : class
     {
         Task<bool> IsExist(Identifier id);
         void AddAsync(TModel obj);
