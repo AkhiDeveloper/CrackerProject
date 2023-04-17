@@ -1,10 +1,10 @@
-﻿using CrackerProject.API.Interfaces;
-using CrackerProject.API.Model;
+﻿using CrackerProject.API.Model;
 using CrackerProject.API.Settings;
 using firebaseauth = Firebase.Auth;
 using Firebase.Storage;
 using ServiceStack.Messaging;
 using Setting = CrackerProject.API.Settings;
+using CrackerProject.API.Data.Interfaces;
 
 namespace CrackerProject.API.Data.Firebase.Storage
 {

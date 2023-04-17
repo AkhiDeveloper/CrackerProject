@@ -1,7 +1,6 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Bson;
 using MongoDB.Driver.Linq;
-using CrackerProject.API.Interfaces;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Threading.Tasks;
 using Humanizer;
 using System.Linq.Expressions;
 using AutoMapper;
+using CrackerProject.API.Data.Interfaces;
 
 namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {

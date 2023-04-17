@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using CrackerProject.API.Data.Interfaces;
 using CrackerProject.API.Data.MongoDb.SchemaOne.Model;
-using CrackerProject.API.Interfaces;
 using Humanizer;
 using MongoDB.Driver;
 using System.Linq.Expressions;

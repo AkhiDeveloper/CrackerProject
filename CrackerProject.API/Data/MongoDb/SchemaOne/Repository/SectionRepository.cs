@@ -1,5 +1,4 @@
-﻿using CrackerProject.API.Interfaces;
-using ServiceStack;
+﻿using ServiceStack;
 using AutoMapper;
 using System.Linq.Expressions;
 using MongoDB.Driver;
@@ -7,6 +6,7 @@ using Humanizer;
 using MongoDB.Driver.Linq;
 using DataModel = CrackerProject.API.Data.MongoDb.SchemaOne.Model;
 using CrackerProject.API.Model.Book;
+using CrackerProject.API.Data.Interfaces;
 
 namespace CrackerProject.API.Data.MongoDb.SchemaOne.Repository
 {

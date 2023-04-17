@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CrackerProject.API.Interfaces;
+using CrackerProject.API.Data.Interfaces;
 using CrackerProject.API.Model;
 using CrackerProject.API.Model.Book;
 using CrackerProject.API.ViewModel;

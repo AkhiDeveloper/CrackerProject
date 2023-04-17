@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
-using CrackerProject.API.Interfaces;
 using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CrackerProject.API.Settings;
+using CrackerProject.API.Data.Interfaces;
 
 namespace CrackerProject.API.Data.MongoDb
 {

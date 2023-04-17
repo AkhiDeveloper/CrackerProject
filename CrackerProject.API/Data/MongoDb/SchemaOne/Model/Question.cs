@@ -1,5 +1,4 @@
-﻿using CrackerProject.API.Interfaces;
-using CrackerProject.API.Data.MongoDb.SchemaOne.Repository;
+﻿using CrackerProject.API.Data.MongoDb.SchemaOne.Repository;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace CrackerProject.API.Data.MongoDb.SchemaOne.Model

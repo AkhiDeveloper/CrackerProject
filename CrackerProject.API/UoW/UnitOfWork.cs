@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CrackerProject.API.Interfaces;
+using CrackerProject.API.Data.Interfaces;
 
 namespace MongoDB.GenericRepository.UoW
 {

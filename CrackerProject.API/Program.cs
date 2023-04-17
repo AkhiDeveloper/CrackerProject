@@ -1,4 +1,3 @@
-using CrackerProject.API.Interfaces;
 using CrackerProject.API.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -9,6 +8,7 @@ using CrackerProject.API.Data.MongoDb.SchemaOne.Repository;
 using CrackerProject.API.Data.MongoDb;
 using CrackerProject.API.Data.MongoDb.SchemaOne.Persistence;
 using CrackerProject.API.Data.Firebase.Storage;
+using CrackerProject.API.Data.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
