@@ -33,16 +33,19 @@ namespace BookManager.API.ServiceProvider
         public async Task CreateChapter
             (Guid bookId, Chapter chapter, Guid? chapterId = null)
         {
-            if(_context.Books.FindAsync(bookId).Result != null)
+            if(_context.Books.FindAsync(bookId).Result == null)
             {
-                throw new Exception($"Book with Id = {bookId} is already exist!");
+                throw new Exception($"Book with Id = {bookId} is not exist!");
             }
             if (_context.Chapters.FindAsync(chapterId).Result != null)
             {
                 throw new Exception($"Chapter with Id = {chapterId} is already exist!");
             }
             var chapter_data = _mapper.Map<Data.Models.Chapter>(chapter);
+            var chapter_count = _context.Chapters.Where(x => x.BookId == bookId && x.ParentChapterId == chapterId).Count();
+            chapter_data.BookId = bookId;
             chapter_data.ParentChapterId = chapterId;
+            chapter_data.SN = chapter_count + 1;
             await _context.Chapters.AddAsync(chapter_data);
             await _context.SaveChangesAsync();
         }

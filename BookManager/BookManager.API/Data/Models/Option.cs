@@ -11,15 +11,14 @@ namespace BookManager.API.Data.Models
         [Required]
         public int SN { get; set; }
 
-        [Required]
-        [StringLength(80, MinimumLength = 1, ErrorMessage = "Book Name should be between characters of 3 and 80")]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
-        public string ImageUri { get; set; } = string.Empty;
+        public string? ImageUri { get; set; }
 
-        public bool IsCorrect { get; set; } = false;
+        public bool IsCorrect { get; set; }
 
         [ForeignKey(nameof(Question))]
+        [Required]
         public Guid QuestionId { get; set; }
     }
 }

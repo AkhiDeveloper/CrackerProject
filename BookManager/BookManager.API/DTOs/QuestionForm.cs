@@ -1,11 +1,11 @@
-﻿namespace BookManager.API.Models
+﻿namespace BookManager.API.DTOs
 {
-    public class Option
+    public class QuestionForm
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public int SN { get; set; }
         public string Text { get; set; }
         public string ImageUri { get; set; } = string.Empty;
-        public bool IsCorrect { get; set; } = false;
+        public IList<OptionForm> Options { get; set; } = new List<OptionForm>();
     }
 }

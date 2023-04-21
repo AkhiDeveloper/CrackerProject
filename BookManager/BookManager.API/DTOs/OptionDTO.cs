@@ -1,6 +1,6 @@
-﻿namespace BookManager.API.Models
+﻿namespace BookManager.API.DTOs
 {
-    public class Option
+    public class OptionDTO
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public int SN { get; set; }
