@@ -1,4 +1,6 @@
-﻿using BookManager.API.DTOs;
+﻿using AutoMapper;
+using BookManager.API.DTOs;
+using BookManager.API.ServiceProvider;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +10,16 @@ namespace BookManager.API.Controllers
     [ApiController]
     public class QuestionsController : ControllerBase
     {
+        private readonly IMapper _mapper;
+        private readonly IQuestionManager _questionManager;
+
+        public QuestionsController(
+            IMapper mapper, IQuestionManager questionManager)
+        {
+            _mapper = mapper;
+            _questionManager = questionManager;
+        }
+
         [HttpGet("Sets/{chapterId}")]
         public async Task<ActionResult<int>> GetTotalNumberOfSets(Guid chapterId)
         {

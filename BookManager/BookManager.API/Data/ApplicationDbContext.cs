@@ -17,5 +17,6 @@ namespace BookManager.API.Data
         public DbSet<Chapter> Chapters { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Option> Options { get; set; }
+        public DbSet<QuestionSet> QuestionSets { get; set; }
     }
 }

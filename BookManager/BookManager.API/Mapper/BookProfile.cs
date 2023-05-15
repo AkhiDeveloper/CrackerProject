@@ -19,7 +19,15 @@ namespace BookManager.API.Mapper
             CreateMap<DTOs.BookEditForm, Models.Book>();
 
             //Model to DataModel
-            CreateMap<Models.Book, Data.Models.Book>().ReverseMap();
+            CreateMap<Models.Book, Data.Models.Book>().ForMember(x => x.Id,opt => opt.MapFrom((src, dst) =>
+            {
+                if(dst.Id == Guid.Empty)
+                {
+                    return src.Id;
+                }
+                return dst.Id;
+            }));
+            CreateMap<Data.Models.Book, Models.Book>();
         }
 
         private string GetApiUrl(string? imageUrl)
