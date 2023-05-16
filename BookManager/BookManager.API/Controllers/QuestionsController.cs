@@ -12,6 +12,7 @@ namespace BookManager.API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IQuestionManager _questionManager;
+        private readonly IChapterManager _chapterManager;
 
         public QuestionsController(
             IMapper mapper, IQuestionManager questionManager)
@@ -25,7 +26,13 @@ namespace BookManager.API.Controllers
         {
             try
             {
-                return Ok();
+                var chapter = await _chapterManager.GetChapterById(chapterId);
+                if (chapter == null)
+                {
+                    throw new Exception($"Chapter with Id = {chapterId} is not found!");
+                }
+                var sets = await _questionManager.GetTotalNumberOfSet(chapterId);
+                return Ok(sets);
             }
             catch(Exception ex)
             {
@@ -39,7 +46,19 @@ namespace BookManager.API.Controllers
         {
             try
             {
-                return Ok();
+                var chapter = await _chapterManager.GetChapterById(chapterId);
+                if (chapter == null)
+                {
+                    throw new Exception($"Chapter with Id = {chapterId} is not found!");
+                }
+                var sets = await _questionManager.GetTotalNumberOfSet(chapterId);
+                if(setNumber > sets)
+                {
+                    throw new Exception($"Set with SN = {setNumber} is not found!");
+                }
+                var questions = _questionManager.GetAllQuestionOfSet(chapterId, setNumber);
+                var questionsdto = _mapper.Map<QuestionDTO>(questions);
+                return Ok(questionsdto);
             }
             catch (Exception ex)
             {

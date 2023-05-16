@@ -36,6 +36,11 @@ namespace BookManager.API.ServiceProvider
             await _context.SaveChangesAsync();
         }
 
+        public Task ChangeOptionImage(Guid questionId, byte[] image)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task ChangeOptions(Guid questionId, IEnumerable<Models.Option> options)
         {
             var question = await _context.Questions.FindAsync(questionId);
@@ -78,7 +83,7 @@ namespace BookManager.API.ServiceProvider
             await _context.SaveChangesAsync();
         }
 
-        public async Task CreateQuestion(Guid chapterId, int set_no, Question question)
+        public async Task CreateQuestion(Guid chapterId, int set_no, Models.Question question)
         {
             var chapter = await _context.Chapters.FindAsync(chapterId);
             if(chapter == null)
@@ -165,9 +170,17 @@ namespace BookManager.API.ServiceProvider
             return models;
         }
 
-        
+        public Task<IEnumerable<Models.Question>> GetAllQuestions(Guid chapterId)
+        {
+            throw new NotImplementedException();
+        }
 
-        public int GetTotalNumberOfSet(Guid chapterId)
+        public Models.Question GetQuestion(Guid chapterId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetTotalNumberOfSet(Guid chapterId)
         {
             throw new NotImplementedException();
         }
