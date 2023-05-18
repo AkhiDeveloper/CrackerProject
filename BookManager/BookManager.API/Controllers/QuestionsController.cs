@@ -15,10 +15,11 @@ namespace BookManager.API.Controllers
         private readonly IChapterManager _chapterManager;
 
         public QuestionsController(
-            IMapper mapper, IQuestionManager questionManager)
+            IMapper mapper, IQuestionManager questionManager, IChapterManager chapterManager)
         {
             _mapper = mapper;
             _questionManager = questionManager;
+            _chapterManager = chapterManager;
         }
 
         [HttpGet("Sets/{chapterId}")]
@@ -41,7 +42,7 @@ namespace BookManager.API.Controllers
         }
 
         [HttpGet("GetSetQuestion/{chapterId}/{setNumber}")]
-        public async Task<ActionResult<QuestionDTO>> GetSetQuestions(Guid chapterId, int setNumber = 1, 
+        public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetSetQuestions(Guid chapterId, int setNumber = 1, 
             int offset = 0, int limit = 10, string orderBy = "", bool isAscending = true)
         {
             try
@@ -56,9 +57,15 @@ namespace BookManager.API.Controllers
                 {
                     throw new Exception($"Set with SN = {setNumber} is not found!");
                 }
-                var questions = _questionManager.GetAllQuestionOfSet(chapterId, setNumber);
-                var questionsdto = _mapper.Map<QuestionDTO>(questions);
-                return Ok(questionsdto);
+                var questions = await _questionManager.GetAllQuestionOfSet(chapterId, setNumber);
+                IList<QuestionDTO> result = new List<QuestionDTO>();
+                foreach( var question in questions)
+                {
+                    var questiondto = _mapper.Map<QuestionDTO>(question);
+                    questiondto.ImageUri = await _questionManager.GetQuestionImageUri(question.Id);
+                    result.Add(questiondto);
+                }
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -71,7 +78,9 @@ namespace BookManager.API.Controllers
         {
             try
             {
-                return Ok();
+                var question = await _questionManager.GetQuestion(questionId);
+                var dto = _mapper.Map<QuestionDTO>(question);
+                return Ok(dto);
             }
             catch (Exception ex)
             {
@@ -84,6 +93,8 @@ namespace BookManager.API.Controllers
         {
             try
             {
+                var question = _mapper.Map<Models.Question>(form);
+                await _questionManager.CreateQuestion(chapterId, SetNumber, question);
                 return Ok();
             }
             catch (Exception ex)
@@ -97,6 +108,7 @@ namespace BookManager.API.Controllers
         {
             try
             {
+                await _questionManager.ChangeText(questionId, new_text);
                 return Ok();
             }
             catch (Exception ex)
@@ -110,6 +122,9 @@ namespace BookManager.API.Controllers
         {
             try
             {
+                Stream imageStream = new MemoryStream();
+                await imageFile.CopyToAsync(imageStream);
+                await _questionManager.ChangeImage(questionId, imageStream);
                 return Ok();
             }
             catch (Exception ex)
@@ -123,6 +138,8 @@ namespace BookManager.API.Controllers
         {
             try
             {
+                var options_model = _mapper.Map<IList<Models.Option>>(options);
+                await _questionManager.ChangeOptions(questionId, options_model);
                 return Ok();
             }
             catch (Exception ex)
@@ -136,6 +153,7 @@ namespace BookManager.API.Controllers
         {
             try
             {
+                await _questionManager.DeleteQuestion(questionId);
                 return Ok();
             }
             catch (Exception ex)

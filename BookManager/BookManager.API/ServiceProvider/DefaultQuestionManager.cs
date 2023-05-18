@@ -19,7 +19,7 @@ namespace BookManager.API.ServiceProvider
             _context = context;
         }
 
-        public Task ChangeImage(Guid questionId, byte[] image)
+        public Task ChangeImage(Guid questionId, Stream image)
         {
             throw new NotImplementedException();
         }
@@ -36,7 +36,7 @@ namespace BookManager.API.ServiceProvider
             await _context.SaveChangesAsync();
         }
 
-        public Task ChangeOptionImage(Guid questionId, byte[] image)
+        public Task ChangeOptionImage(Guid questionId, int opt_sn, Stream image)
         {
             throw new NotImplementedException();
         }
@@ -146,7 +146,7 @@ namespace BookManager.API.ServiceProvider
            await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Models.Question>> GetAllQuestionOfLastSetAsync(Guid chapterId)
+        public async Task<IEnumerable<Models.Question>> GetAllQuestionOfLastSet(Guid chapterId)
         {
             var questionSet = await _context.QuestionSets.Where(x => x.ChapterId == chapterId).OrderByDescending(x => x.SN).FirstOrDefaultAsync();
             if (questionSet == null)
@@ -170,19 +170,42 @@ namespace BookManager.API.ServiceProvider
             return models;
         }
 
-        public Task<IEnumerable<Models.Question>> GetAllQuestions(Guid chapterId)
+        public async Task<IEnumerable<Models.Question>> GetAllQuestions(Guid chapterId)
+        {
+            IEnumerable<Data.Models.QuestionSet> questionSets = _context.QuestionSets.Where(x => x.ChapterId == chapterId);
+            IList<Models.Question> questions = new List<Models.Question>();
+            foreach (var questionSet in questionSets)
+            {
+                var data_questions = _context.Questions.Where(x => x.ParentSetId == questionSet.Id);
+                var model_questions = _mapper.Map<IList<Models.Question>>(data_questions);
+                foreach(var model in model_questions)
+                {
+                    questions.Add(model);
+                }
+            }
+            return questions;
+        }
+
+        public Task<string> GetOptionImageUri(Guid questionId, int opt_sn)
         {
             throw new NotImplementedException();
         }
 
-        public Models.Question GetQuestion(Guid chapterId)
+        public async Task<Models.Question> GetQuestion(Guid questionId)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            return _mapper.Map<Models.Question>(question);
+        }
+
+        public Task<string> GetQuestionImageUri(Guid questionId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<int> GetTotalNumberOfSet(Guid chapterId)
+        public async Task<int> GetTotalNumberOfSet(Guid chapterId)
         {
-            throw new NotImplementedException();
+            var questionSets =  _context.QuestionSets.Where(x => x.ChapterId == chapterId);
+            return await questionSets.CountAsync();
         }
 
         private async Task<Data.Models.QuestionSet> CreateQuestionSet(Guid chapterId,int Sn, string Description)
