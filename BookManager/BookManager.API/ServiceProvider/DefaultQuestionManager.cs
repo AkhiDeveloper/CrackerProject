@@ -210,14 +210,22 @@ namespace BookManager.API.ServiceProvider
 
         private async Task<Data.Models.QuestionSet> CreateQuestionSet(Guid chapterId,int Sn, string Description)
         {
+            var chapter = await _context.Chapters.FindAsync(chapterId);
+            if(chapter == null)
+            {
+                throw new Exception("Chapter is not found!");
+            }
             Data.Models.QuestionSet questionSet = new Data.Models.QuestionSet();
             questionSet.Id = Guid.NewGuid();
-            if(await _context.QuestionSets.Where(x => x).AnyAsync(x => x.SN == Sn))
+            if(await _context.QuestionSets.Where(x => x.ChapterId == chapterId).AnyAsync(x => x.SN == Sn))
             {
                 throw new Exception($"Set with Sn = {Sn} is already exist!");
             }
             questionSet.Description = Description;
             questionSet.SN = Sn;
+            questionSet.ChapterId = chapterId;
+            await _context.QuestionSets.AddAsync(questionSet);
+            await _context.SaveChangesAsync();
             return questionSet;
         }
     }

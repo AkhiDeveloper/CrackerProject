@@ -41,7 +41,7 @@ namespace BookManager.API.Controllers
             }
         }
 
-        [HttpGet("GetSetQuestion/{chapterId}/{setNumber}")]
+        [HttpGet("SetQuestion/{chapterId}/{setNumber}")]
         public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetSetQuestions(Guid chapterId, int setNumber = 1, 
             int offset = 0, int limit = 10, string orderBy = "", bool isAscending = true)
         {
@@ -62,7 +62,6 @@ namespace BookManager.API.Controllers
                 foreach( var question in questions)
                 {
                     var questiondto = _mapper.Map<QuestionDTO>(question);
-                    questiondto.ImageUri = await _questionManager.GetQuestionImageUri(question.Id);
                     result.Add(questiondto);
                 }
                 return Ok(result);
@@ -89,13 +88,22 @@ namespace BookManager.API.Controllers
         }
 
         [HttpPost("{chapterId}/{setNumber}")]
-        public async Task<ActionResult> AddQuestion(Guid chapterId, int SetNumber, [FromForm]QuestionForm form)
+        public async Task<ActionResult<QuestionDTO>> AddQuestion(Guid chapterId, int setNumber, [FromForm]QuestionForm form)
         {
             try
             {
                 var question = _mapper.Map<Models.Question>(form);
-                await _questionManager.CreateQuestion(chapterId, SetNumber, question);
-                return Ok();
+                await _questionManager.CreateQuestion(chapterId, setNumber, question);
+                if(form.ImageFile != null)
+                {
+                    var imageStream = new MemoryStream();
+                    form.ImageFile.CopyTo(imageStream);
+                    await _questionManager.ChangeImage(question.Id, imageStream);
+                }
+                var questionData = await _questionManager.GetQuestion(question.Id);
+                _mapper.Map(questionData, question);
+                var questionDto = _mapper.Map<QuestionDTO>(question);
+                return Ok(questionDto);
             }
             catch (Exception ex)
             {

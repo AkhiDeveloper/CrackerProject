@@ -21,6 +21,7 @@ builder.Services.AddAutoMapper(configuration =>
 
 builder.Services.AddScoped<IBookManager, DefaultBookManager>();
 builder.Services.AddScoped<IChapterManager, DefaultChapterManager>();
+builder.Services.AddScoped<IQuestionManager,  DefaultQuestionManager>();
 
 builder.Services.AddControllers();
 
