@@ -11,17 +11,47 @@ namespace BookManager.API.ServiceProvider
     {
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
+        private readonly IFileStorage _fileStorage;
 
         public DefaultQuestionManager(IMapper mapper,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IFileStorage fileStorage)
         {
             _mapper = mapper;
             _context = context;
+            _fileStorage = fileStorage;
         }
 
-        public Task ChangeImage(Guid questionId, Stream image)
+        private async Task<IList<string>> GetFolderArrayForQuestion(Guid questionId)
         {
-            throw new NotImplementedException();
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+            {
+                throw new Exception($"Question with id = {questionId} is not found!");
+            }
+            var questionSet = await _context.QuestionSets.FindAsync(question.ParentSetId);
+            IList<string> folderPaths = new List<string>() { questionId.ToString(), questionSet.SN.ToString()};
+            var chapter = await _context.Chapters.FindAsync(questionSet.ChapterId);
+            var chapterPaths = this.GetFolderArrayForChapter(chapter.Id);
+            for()
+        }
+
+        private async Task<IList<string>> GetFolderArrayForChapter(Guid chapterId)
+        {
+
+        }
+
+        public async Task ChangeImage(Guid questionId, Stream image)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+            {
+                throw new Exception($"Question with id = {questionId} is not found!");
+            }
+            var questionSet = await _context.QuestionSets.FindAsync(question.ParentSetId);
+            var chapter = await _context.Chapters.FindAsync(questionSet.ChapterId);
+            var 
+            var folderPath = $"{}"
         }
 
         public async Task ChangeOption(Guid questionId, int OptSN, Models.Option option)
