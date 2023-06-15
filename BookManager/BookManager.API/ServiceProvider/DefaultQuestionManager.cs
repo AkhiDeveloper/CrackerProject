@@ -22,36 +22,43 @@ namespace BookManager.API.ServiceProvider
             _fileStorage = fileStorage;
         }
 
-        private async Task<IList<string>> GetFolderArrayForQuestion(Guid questionId)
+        private async Task<Guid?> GetBookIdOfQuestionId(Guid questionId)
         {
             var question = await _context.Questions.FindAsync(questionId);
-            if (question == null)
+            if (question is null)
             {
                 throw new Exception($"Question with id = {questionId} is not found!");
             }
             var questionSet = await _context.QuestionSets.FindAsync(question.ParentSetId);
-            IList<string> folderPaths = new List<string>() { questionId.ToString(), questionSet.SN.ToString()};
+            if (questionSet is null)
+            {
+                throw new Exception($"QuestionSet is not found!");
+            }
             var chapter = await _context.Chapters.FindAsync(questionSet.ChapterId);
-            var chapterPaths = this.GetFolderArrayForChapter(chapter.Id);
-            for()
-        }
-
-        private async Task<IList<string>> GetFolderArrayForChapter(Guid chapterId)
-        {
-
+            while (chapter is not null)
+            {
+                if(chapter.BookId != Guid.Empty)
+                {
+                    break;
+                }
+                chapter = await _context.Chapters.FindAsync(chapter.ParentChapterId);
+            }
+            return chapter is null?null:chapter.BookId;
         }
 
         public async Task ChangeImage(Guid questionId, Stream image)
         {
             var question = await _context.Questions.FindAsync(questionId);
-            if (question == null)
+            if (question is null)
             {
                 throw new Exception($"Question with id = {questionId} is not found!");
             }
-            var questionSet = await _context.QuestionSets.FindAsync(question.ParentSetId);
-            var chapter = await _context.Chapters.FindAsync(questionSet.ChapterId);
-            var 
-            var folderPath = $"{}"
+            var bookId = await this.GetBookIdOfQuestionId(questionId);
+            string folderName = bookId.ToString()??string.Empty;
+            string fileName = $"{questionId.ToString()}.png";
+            await _fileStorage.UploadFile(fileName, image, folderName);
+            question.ImageUri = Path.Combine(folderName, fileName);
+            _context.SaveChanges();
         }
 
         public async Task ChangeOption(Guid questionId, int OptSN, Models.Option option)
