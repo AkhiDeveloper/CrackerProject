@@ -3,6 +3,7 @@ using BookManager.API.Data;
 using BookManager.API.Data.Models;
 using BookManager.API.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace BookManager.API.ServiceProvider
 {
@@ -54,7 +55,7 @@ namespace BookManager.API.ServiceProvider
                 throw new Exception($"Question with id = {questionId} is not found!");
             }
             var bookId = await this.GetBookIdOfQuestionId(questionId);
-            string folderName = bookId.ToString()??string.Empty;
+            string folderName = Path.Combine(bookId.ToString()??string.Empty,"Questions");
             string fileName = $"{questionId.ToString()}.png";
             await _fileStorage.UploadFile(fileName, image, folderName);
             question.ImageUri = Path.Combine(folderName, fileName);
@@ -73,9 +74,24 @@ namespace BookManager.API.ServiceProvider
             await _context.SaveChangesAsync();
         }
 
-        public Task ChangeOptionImage(Guid questionId, int opt_sn, Stream image)
+        public async Task ChangeOptionImage(Guid questionId, int opt_sn, Stream image)
         {
-            throw new NotImplementedException();
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question is null)
+            {
+                throw new Exception($"Question with id = {questionId} is not found!");
+            }
+            var option = question.Options.Where(x => x.SN == opt_sn).FirstOrDefault();
+            if (option is null)
+            {
+                throw new Exception($"Option with sn = {opt_sn} is not found!");
+            }
+            var bookId = await this.GetBookIdOfQuestionId(questionId);
+            string folderName = Path.Combine(bookId.ToString() ?? string.Empty, "Options");
+            string fileName = $"{questionId.ToString()}_{opt_sn}.png";
+            await _fileStorage.UploadFile(fileName, image, folderName);
+            option.ImageUri = Path.Combine(folderName, fileName);
+            _context.SaveChanges();
         }
 
         public async Task ChangeOptions(Guid questionId, IEnumerable<Models.Option> options)
