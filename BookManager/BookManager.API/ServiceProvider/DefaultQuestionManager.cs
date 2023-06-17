@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using BookManager.API.Data;
-using BookManager.API.Data.Models;
-using BookManager.API.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace BookManager.API.ServiceProvider
 {
@@ -71,6 +68,10 @@ namespace BookManager.API.ServiceProvider
             }
             var orginal_option = question.Options.Where(x => x.SN == OptSN).FirstOrDefault();
             _mapper.Map(option, orginal_option);
+            if(option.Image is not null)
+            {
+                await ChangeOptionImage(questionId, OptSN, option.Image);
+            }
             await _context.SaveChangesAsync();
         }
 
@@ -110,6 +111,7 @@ namespace BookManager.API.ServiceProvider
                 option.SN = i;
                 var option_data = _mapper.Map<Data.Models.Option>(option);  
                 question.Options.Add(option_data);
+                await ChangeOptionImage(questionId, option.SN, option.Image);
             }
             await _context.SaveChangesAsync();
         }
@@ -151,6 +153,11 @@ namespace BookManager.API.ServiceProvider
             var data_question = _mapper.Map<Data.Models.Question>(question);
             data_question.ParentSetId = set.Id;
             await _context.Questions.AddAsync(data_question);
+            if(question.Image is not null)
+            {
+                await ChangeImage(question.Id, question.Image);
+            }
+            await ChangeOptions(question.Id, question.Options);
             await _context.SaveChangesAsync();
         }
 
@@ -161,15 +168,13 @@ namespace BookManager.API.ServiceProvider
             {
                 throw new Exception($"Chapter with id = {chapterId} is not found!");
             }
+            int set_sn = 1;
             var set = await _context.QuestionSets.Where(x => x.ChapterId == chapterId).OrderByDescending(x => x.SN).FirstOrDefaultAsync();
-            if(set == null)
+            if(set is not null)
             {
-                set = await this.CreateQuestionSet(chapterId, 1, "");
+                set_sn = set.SN;
             }
-            var data_question = _mapper.Map<Data.Models.Question>(question);
-            data_question.ParentSetId = set.Id;
-            await _context.Questions.AddAsync(data_question);
-            await _context.SaveChangesAsync();
+            await CreateQuestion(chapterId, set_sn, question);
         }
 
         public async Task DeleteQuestion(Guid questionId)
@@ -230,29 +235,58 @@ namespace BookManager.API.ServiceProvider
             foreach (var questionSet in questionSets)
             {
                 var data_questions = _context.Questions.Where(x => x.ParentSetId == questionSet.Id);
-                var model_questions = _mapper.Map<IList<Models.Question>>(data_questions);
-                foreach(var model in model_questions)
+                foreach(var data_question in data_questions)
                 {
-                    questions.Add(model);
+                    questions.Add(await this.GetQuestion(data_question.Id));
                 }
             }
             return questions;
         }
 
-        public Task<string> GetOptionImageUri(Guid questionId, int opt_sn)
+        public async Task<Stream> GetOptionImage(Guid questionId, int opt_sn)
         {
-            throw new NotImplementedException();
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+            {
+                throw new Exception("Question not found!");
+            }
+            var option = question.Options.Where(x => x.SN == opt_sn).FirstOrDefault();
+            if(option == null)
+            {
+                throw new Exception("Option not found!");
+            }
+            if(option.ImageUri is null)
+            {
+                throw new Exception("Image is not found!");
+            }
+            var image = await _fileStorage.DownloadFile(option.ImageUri);
+            return image;
         }
 
         public async Task<Models.Question> GetQuestion(Guid questionId)
         {
             var question = await _context.Questions.FindAsync(questionId);
+            if(question == null)
+            {
+                throw new Exception("Question not found!");
+            }
+            Stream? imageStream = question.ImageUri is null ? null : await _fileStorage.DownloadFile(question.ImageUri);
             return _mapper.Map<Models.Question>(question);
         }
 
-        public Task<string> GetQuestionImageUri(Guid questionId)
+        public async Task<Stream> GetQuestionImage(Guid questionId)
         {
-            throw new NotImplementedException();
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+            {
+                throw new Exception("Question not found!");
+            }
+            Stream? imageStream = question.ImageUri is null ? null : await _fileStorage.DownloadFile(question.ImageUri);
+            if(imageStream == null)
+            {
+                throw new Exception("Image for this question is not found");
+            }
+            return imageStream;
         }
 
         public async Task<int> GetTotalNumberOfSet(Guid chapterId)

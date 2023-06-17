@@ -15,9 +15,9 @@ namespace BookManager.API.ServiceProvider
 
         Task<Question> GetQuestion(Guid questionId);
 
-        Task<string> GetQuestionImageUri(Guid questionId);
+        Task<Stream> GetQuestionImage(Guid questionId);
 
-        Task<string> GetOptionImageUri(Guid questionId, int opt_sn);
+        Task<Stream> GetOptionImage(Guid questionId, int opt_sn);
 
         Task CreateQuestion(Guid chapterId, int set_no, Question question);
 
