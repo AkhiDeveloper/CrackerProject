@@ -57,11 +57,6 @@ namespace BookManager.API.Controllers
             {
                 var model = _mapper.Map<Models.Book>(bookForm);
                 await _bookManager.CreateBook(model);
-                if(bookForm.Image != null)
-                {
-                    var extension = bookForm.Image.FileName.Split('.')[1];
-                    await _bookManager.SaveImage(model.Id, bookForm.Image.OpenReadStream(), extension);
-                }
                 return Ok($"Book is created with Id = {model.Id}");
             }
             catch (Exception ex)

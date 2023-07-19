@@ -1,7 +1,7 @@
 ﻿namespace BookManager.API.ServiceProvider
 {
     public class LocalFileStorage
-        : IFileStorage
+        : IFileStorage, IDisposable
     {
         private readonly string _basePath;
 
@@ -41,6 +41,10 @@
             return Task.CompletedTask;
         }
 
+        public void Dispose()
+        {
+        }
+
         public async Task<Stream> DownloadFile(string fileName, string folderPath = "")
         {
             var targetFolderPath = Path.Combine(_basePath, folderPath);
@@ -78,6 +82,7 @@
             var targetFilePath = Path.Combine(targetFolderPath, fileName);
             Stream fileStream = new FileStream(targetFilePath, FileMode.CreateNew, FileAccess.Write);
             await stream.CopyToAsync(fileStream);
+            await fileStream.DisposeAsync();
         }
     }
 }

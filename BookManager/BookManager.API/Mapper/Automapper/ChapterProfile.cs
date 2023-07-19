@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace BookManager.API.Mapper
+namespace BookManager.API.Mapper.Automapper
 {
     public class ChapterProfile
         : Profile

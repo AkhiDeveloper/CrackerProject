@@ -42,8 +42,8 @@ namespace BookManager.API.Controllers
         }
 
         [HttpGet("SetQuestion/{chapterId}/{setNumber}")]
-        public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetSetQuestions(Guid chapterId, int setNumber = 1, 
-            int offset = 0, int limit = 10, string orderBy = "", bool isAscending = true)
+        public async Task<ActionResult<IEnumerable<QuestionDTO>>> GetSetQuestions
+            (Guid chapterId, int setNumber = 1, int offset = 0, int limit = 10, string orderBy = "", bool isAscending = true)
         {
             try
             {

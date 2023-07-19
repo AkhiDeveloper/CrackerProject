@@ -2,12 +2,12 @@
 using BookManager.API.DTOs;
 using BookManager.API.ServiceProvider;
 
-namespace BookManager.API.Mapper
+namespace BookManager.API.Mapper.Automapper
 {
     public class QuestionsProfile
         : Profile
     {
-        public QuestionsProfile(IFileStorage fileStorage)
+        public QuestionsProfile()
         {
             CreateMap<QuestionForm, Models.Question>();
             CreateMap<Models.Question, QuestionDTO>();

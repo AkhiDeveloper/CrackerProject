@@ -1,6 +1,6 @@
 ﻿namespace BookManager.API.ServiceProvider
 {
-    public interface IFileStorage
+    public interface IFileStorage: IDisposable
     {
         Task UploadFile(string fileName, Stream stream, string folderPath = "");
         Task DeleteFile(string fileName, string folderPath="");

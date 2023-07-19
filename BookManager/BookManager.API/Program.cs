@@ -22,6 +22,7 @@ builder.Services.AddAutoMapper(configuration =>
 builder.Services.AddScoped<IBookManager, DefaultBookManager>();
 builder.Services.AddScoped<IChapterManager, DefaultChapterManager>();
 builder.Services.AddScoped<IQuestionManager,  DefaultQuestionManager>();
+builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
 
 builder.Services.AddControllers();
 
@@ -43,14 +44,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseStaticFiles();
-
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    ContentTypeProvider = new FileExtensionContentTypeProvider
-//    {
-//        Mappings = { [".jpg"] = "image/jpeg", [".png"] = "image/png" }
-//    }
-//});
 
 app.MapControllers();
 

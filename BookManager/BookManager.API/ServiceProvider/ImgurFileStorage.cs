@@ -17,6 +17,11 @@
             throw new NotImplementedException();
         }
 
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<Stream> DownloadFile(string fileName, string folderPath = "")
         {
             throw new NotImplementedException();

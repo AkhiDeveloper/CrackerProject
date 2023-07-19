@@ -37,9 +37,12 @@ namespace BookManager.API.ServiceProvider
             {
                 throw new Exception($"Book with Id = {bookId} is not exist!");
             }
-            if (_context.Chapters.FindAsync(chapterId).Result == null)
+            if(chapterId is not null)
             {
-                throw new Exception($"Parent Chapter with Id = {chapterId} is not exist!");
+                if (_context.Chapters.FindAsync(chapterId).Result == null)
+                {
+                    throw new Exception($"Parent Chapter with Id = {chapterId} is not exist!");
+                }
             }
             var chapter_data = _mapper.Map<Data.Models.Chapter>(chapter);
             var chapter_count = _context.Chapters.Where(x => x.BookId == bookId && x.ParentChapterId == chapterId).Count();

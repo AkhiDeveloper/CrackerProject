@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BookManager.API.ServiceProvider
 {
     public class DefaultQuestionManager
-        : IQuestionManager
+        : IQuestionManager, IDisposable
     {
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
@@ -314,6 +314,11 @@ namespace BookManager.API.ServiceProvider
             await _context.QuestionSets.AddAsync(questionSet);
             await _context.SaveChangesAsync();
             return questionSet;
+        }
+
+        public void Dispose()
+        {
+            _fileStorage.Dispose();
         }
     }
 }
