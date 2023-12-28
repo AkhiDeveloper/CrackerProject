@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using BookManager.API.DTOs;
+using BookManager.API.Models;
 using BookManager.API.ServiceProvider;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace BookManager.API.Controllers
 {
@@ -13,13 +14,15 @@ namespace BookManager.API.Controllers
         private readonly IMapper _mapper;
         private readonly IQuestionManager _questionManager;
         private readonly IChapterManager _chapterManager;
+        private readonly IQuestionTextConverter _qsnTxtConverter;
 
         public QuestionsController(
-            IMapper mapper, IQuestionManager questionManager, IChapterManager chapterManager)
+            IMapper mapper, IQuestionManager questionManager, IChapterManager chapterManager, IQuestionTextConverter qsnTxtConverter)
         {
             _mapper = mapper;
             _questionManager = questionManager;
             _chapterManager = chapterManager;
+            _qsnTxtConverter = qsnTxtConverter;
         }
 
         [HttpGet("Sets/{chapterId}")]
@@ -104,6 +107,55 @@ namespace BookManager.API.Controllers
                 _mapper.Map(questionData, question);
                 var questionDto = _mapper.Map<QuestionDTO>(question);
                 return Ok(questionDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("{chapterId}/FromRawFiles")]
+        public async Task<IActionResult> AddQuestionsUsingRawTextFile
+            (Guid chapterId, [FromForm] UploadQuestionFromFileRequestBody requestBody)
+        {
+            try
+            {
+                string[] allowableExtensions = { "txt", "csv" };
+                if(allowableExtensions.Contains(Path.GetExtension(requestBody.QuestionRawText.FileName)))
+                {
+                    throw new Exception($"QuestionRawText File should be of file type \"{allowableExtensions}\"");
+                }
+                if (allowableExtensions.Contains(Path.GetExtension(requestBody.CorrectQuestionRawText.FileName)))
+                {
+                    throw new Exception($"QuestionRawText File should be of file type \"{allowableExtensions}\"");
+                }
+                var qsnString = String.Empty;
+                var corrOptString = String.Empty;
+                using(var stream = requestBody.QuestionRawText.OpenReadStream())
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    byte[] buffer = new byte[stream.Length];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+                    qsnString = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                }
+                using (var stream = requestBody.CorrectQuestionRawText.OpenReadStream())
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    byte[] buffer = new byte[stream.Length];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+                    corrOptString = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                }
+                var isParsed = _qsnTxtConverter.TryParse
+                    (qsnString, corrOptString, out IEnumerable<Question> readedQuestions);
+                if (!isParsed) { throw new Exception("Failed To Parse Question and Option Text"); }
+                var qsnSetNum = (await _questionManager.GetTotalNumberOfSet(chapterId)) + 1;
+                foreach(var question in readedQuestions)
+                {
+                    await _questionManager.CreateQuestion(chapterId, qsnSetNum, question);
+                }
+                return Ok();
             }
             catch (Exception ex)
             {

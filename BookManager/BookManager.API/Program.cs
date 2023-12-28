@@ -23,6 +23,7 @@ builder.Services.AddScoped<IBookManager, DefaultBookManager>();
 builder.Services.AddScoped<IChapterManager, DefaultChapterManager>();
 builder.Services.AddScoped<IQuestionManager,  DefaultQuestionManager>();
 builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
+builder.Services.AddScoped<IQuestionTextConverter, DefaultQuestionTextConverter>();
 
 builder.Services.AddControllers();
 
