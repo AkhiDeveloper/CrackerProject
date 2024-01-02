@@ -68,10 +68,11 @@ namespace BookManager.API.ServiceProvider
                     };
                     if (currentQuestion.OptionsSets.Last().Options.Any(option => option.Key == key))
                     {
+                        var sn = currentQuestion.OptionsSets.Count() + 1;
                         currentQuestion.OptionsSets.Add(new OptionsSet()
                         {
                             Id = Guid.NewGuid(),
-                            SN = 1,
+                            SN = (short) sn,
                             Options = new List<Option>(),
                         });
                     }
