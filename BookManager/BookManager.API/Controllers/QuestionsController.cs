@@ -114,6 +114,13 @@ namespace BookManager.API.Controllers
             }
         }
 
+        [HttpPost("{chapterId}/FromJsonFiles")]
+        public async Task<IActionResult> AddQuestionsUsingJsonFile
+            (Guid chapterId, [FromForm] UploadQuestionFromFileRequestBody requestBody)
+        {
+            return Ok();
+        }
+
         [HttpPost("{chapterId}/FromRawFiles")]
         public async Task<IActionResult> AddQuestionsUsingRawTextFile
             (Guid chapterId, [FromForm] UploadQuestionFromFileRequestBody requestBody)
@@ -150,11 +157,11 @@ namespace BookManager.API.Controllers
                 var isParsed = _qsnTxtConverter.TryParse
                     (qsnString, corrOptString, out IEnumerable<Question> readedQuestions);
                 if (!isParsed) { throw new Exception("Failed To Parse Question and Option Text"); }
-                var qsnSetNum = (await _questionManager.GetTotalNumberOfSet(chapterId)) + 1;
-                foreach(var question in readedQuestions)
-                {
-                    await _questionManager.CreateQuestion(chapterId, qsnSetNum, question);
-                }
+                //var qsnSetNum = (await _questionManager.GetTotalNumberOfSet(chapterId)) + 1;
+                //foreach(var question in readedQuestions)
+                //{
+                //    await _questionManager.CreateQuestion(chapterId, qsnSetNum, question);
+                //}
                 return Ok();
             }
             catch (Exception ex)

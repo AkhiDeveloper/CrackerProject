@@ -157,7 +157,7 @@ namespace BookManager.API.ServiceProvider
             {
                 await ChangeImage(question.Id, question.Image);
             }
-            await ChangeOptions(question.Id, question.Options);
+            //await ChangeOptions(question.Id, question.Options);
             await _context.SaveChangesAsync();
         }
 
