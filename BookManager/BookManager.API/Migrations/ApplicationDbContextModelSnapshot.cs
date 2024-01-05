@@ -17,7 +17,7 @@ namespace BookManager.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -99,12 +99,13 @@ namespace BookManager.API.Migrations
                     b.Property<int>("SN")
                         .HasColumnType("int");
 
+                    b.Property<short>("SetNumber")
+                        .HasColumnType("smallint");
+
                     b.Property<string>("Text")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
 
                     b.ToTable("Options");
                 });
@@ -152,20 +153,6 @@ namespace BookManager.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("QuestionSets");
-                });
-
-            modelBuilder.Entity("BookManager.API.Data.Models.Option", b =>
-                {
-                    b.HasOne("BookManager.API.Data.Models.Question", null)
-                        .WithMany("Options")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("BookManager.API.Data.Models.Question", b =>
-                {
-                    b.Navigation("Options");
                 });
 #pragma warning restore 612, 618
         }

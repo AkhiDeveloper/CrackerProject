@@ -9,7 +9,7 @@ namespace BookManager.API.ServiceProvider
 
         Task<IEnumerable<Question>> GetAllQuestions(Guid chapterId);
 
-        Task<IEnumerable<Question>> GetAllQuestionOfSet(Guid chapterId, int SetSN);
+        Task<IEnumerable<Question>> GetAllQuestionOfSet(Guid chapterId, int SetSN); 
 
         Task<IEnumerable<Question>> GetAllQuestionOfLastSet(Guid chapterId);
 
@@ -25,11 +25,21 @@ namespace BookManager.API.ServiceProvider
 
         Task ChangeImage(Guid questionId, Stream image);
 
+        Task AddOption(Guid questionId, Option option);
+
+        Task AddOption(Guid questionId, short optionsSetSN, Option option);
+
         Task ChangeOption(Guid questionId, int OptSN, Option option);
+
+        Task ChangeOption(Guid questionId, short optionsSetSN, int OptSN, Option option); 
 
         Task ChangeOptionImage(Guid questionId, int opt_sn, Stream image);
 
-        Task ChangeOptions(Guid questionId, IEnumerable<Option> options);
+        Task ChangeOptionImage(Guid questionId, short optionsSetSN, int opt_sn, Stream image);
+
+        Task AddOptionsSet(Guid questionId, IEnumerable<Option> options);
+
+        //Task ChangeOptionsSet(Guid questionId, short optionsSetSN, IEnumerable<Option> options);
 
         Task ChangeSN(Guid questionId, int SN);
 

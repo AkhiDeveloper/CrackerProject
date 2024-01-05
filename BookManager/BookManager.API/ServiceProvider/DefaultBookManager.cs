@@ -66,7 +66,7 @@ namespace BookManager.API.ServiceProvider
 
         public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            var datas = _context.Books;
+            var datas = _context.Books.ToList();
             return _mapper.Map<IEnumerable<Book>>(datas);
         }
 

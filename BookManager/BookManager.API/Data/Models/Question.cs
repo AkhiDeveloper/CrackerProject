@@ -19,7 +19,5 @@ namespace BookManager.API.Data.Models
 
         [ForeignKey(nameof(QuestionSet))]
         public Guid ParentSetId { get; set; }
-
-        public IList<Option> Options { get; set; }
     }
 }

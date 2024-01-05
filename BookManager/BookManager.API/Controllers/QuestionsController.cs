@@ -102,6 +102,7 @@ namespace BookManager.API.Controllers
                     var imageStream = new MemoryStream();
                     form.ImageFile.CopyTo(imageStream);
                     await _questionManager.ChangeImage(question.Id, imageStream);
+                    imageStream.DisposeAsync();
                 }
                 var questionData = await _questionManager.GetQuestion(question.Id);
                 _mapper.Map(questionData, question);
@@ -206,7 +207,7 @@ namespace BookManager.API.Controllers
             try
             {
                 var options_model = _mapper.Map<IList<Models.Option>>(options);
-                await _questionManager.ChangeOptions(questionId, options_model);
+                await _questionManager.AddOptionsSet(questionId, options_model);
                 return Ok();
             }
             catch (Exception ex)

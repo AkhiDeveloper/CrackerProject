@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookManager.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230401090439_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240105112248_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -32,11 +32,12 @@ namespace BookManager.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Author")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -65,7 +66,6 @@ namespace BookManager.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -73,7 +73,7 @@ namespace BookManager.API.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
-                    b.Property<Guid>("ParentChapterId")
+                    b.Property<Guid?>("ParentChapterId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("SN")
@@ -91,7 +91,6 @@ namespace BookManager.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageUri")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsCorrect")
@@ -103,14 +102,13 @@ namespace BookManager.API.Migrations
                     b.Property<int>("SN")
                         .HasColumnType("int");
 
+                    b.Property<short>("SetNumber")
+                        .HasColumnType("smallint");
+
                     b.Property<string>("Text")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
 
                     b.ToTable("Options");
                 });
@@ -122,8 +120,10 @@ namespace BookManager.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageUri")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ParentSetId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("SN")
                         .HasColumnType("int");
@@ -138,18 +138,24 @@ namespace BookManager.API.Migrations
                     b.ToTable("Questions");
                 });
 
-            modelBuilder.Entity("BookManager.API.Data.Models.Option", b =>
+            modelBuilder.Entity("BookManager.API.Data.Models.QuestionSet", b =>
                 {
-                    b.HasOne("BookManager.API.Data.Models.Question", null)
-                        .WithMany("Options")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-            modelBuilder.Entity("BookManager.API.Data.Models.Question", b =>
-                {
-                    b.Navigation("Options");
+                    b.Property<Guid>("ChapterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SN")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("QuestionSets");
                 });
 #pragma warning restore 612, 618
         }

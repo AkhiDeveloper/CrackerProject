@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BookManager.API.Data;
+using BookManager.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookManager.API.ServiceProvider
@@ -41,7 +42,7 @@ namespace BookManager.API.ServiceProvider
                 }
                 chapter = await _context.Chapters.FindAsync(chapter.ParentChapterId);
             }
-            return chapter is null?null:chapter.BookId;
+            return chapter is null ? null : chapter.BookId;
         }
 
         public async Task ChangeImage(Guid questionId, Stream image)
@@ -61,17 +62,8 @@ namespace BookManager.API.ServiceProvider
 
         public async Task ChangeOption(Guid questionId, int OptSN, Models.Option option)
         {
-            var question = await _context.Questions.FindAsync(questionId);
-            if(question == null)
-            {
-                throw new Exception($"Question with id = {questionId} is not found!");
-            }
-            var orginal_option = question.Options.Where(x => x.SN == OptSN).FirstOrDefault();
-            _mapper.Map(option, orginal_option);
-            if(option.Image is not null)
-            {
-                await ChangeOptionImage(questionId, OptSN, option.Image);
-            }
+            var option_data = await GetOptionData(questionId, OptSN);
+            _mapper.Map(option, option_data);
             await _context.SaveChangesAsync();
         }
 
@@ -82,7 +74,9 @@ namespace BookManager.API.ServiceProvider
             {
                 throw new Exception($"Question with id = {questionId} is not found!");
             }
-            var option = question.Options.Where(x => x.SN == opt_sn).FirstOrDefault();
+            var number_of_sets = await _context.Options.MaxAsync(x => x.SetNumber);
+            if (number_of_sets > 1) throw new Exception("there are multiple option-set.");
+            var option = await _context.Options.Where(x => x.QuestionId == question.Id).Where( x=> x.SN == opt_sn ).FirstOrDefaultAsync();
             if (option is null)
             {
                 throw new Exception($"Option with sn = {opt_sn} is not found!");
@@ -95,23 +89,23 @@ namespace BookManager.API.ServiceProvider
             _context.SaveChanges();
         }
 
-        public async Task ChangeOptions(Guid questionId, IEnumerable<Models.Option> options)
+        public async Task AddOptionsSet(Guid questionId, IEnumerable<Models.Option> options)
         {
             var question = await _context.Questions.FindAsync(questionId);
             if (question == null)
             {
                 throw new Exception($"Question with id = {questionId} is not found!");
             }
-            question.Options.Clear();
+            short setNumber = (short)((await _context.Options.Where(x => x.QuestionId == question.Id).MaxAsync(x => x.SetNumber)) + 1);
             await _context.SaveChangesAsync();
             int i = 0;
             foreach(var option in options)
             {
                 i++;
                 option.SN = i;
-                var option_data = _mapper.Map<Data.Models.Option>(option);  
-                question.Options.Add(option_data);
-                await ChangeOptionImage(questionId, option.SN, option.Image);
+                var option_data = _mapper.Map<Data.Models.Option>(option);
+                option_data.QuestionId = questionId;
+                option_data.SetNumber = setNumber;
             }
             await _context.SaveChangesAsync();
         }
@@ -157,7 +151,10 @@ namespace BookManager.API.ServiceProvider
             {
                 await ChangeImage(question.Id, question.Image);
             }
-            //await ChangeOptions(question.Id, question.Options);
+            foreach(var optsSet in question.OptionsSets)
+            {
+                await AddOptionsSet(question.Id, optsSet.Options);
+            }
             await _context.SaveChangesAsync();
         }
 
@@ -245,12 +242,7 @@ namespace BookManager.API.ServiceProvider
 
         public async Task<Stream> GetOptionImage(Guid questionId, int opt_sn)
         {
-            var question = await _context.Questions.FindAsync(questionId);
-            if (question == null)
-            {
-                throw new Exception("Question not found!");
-            }
-            var option = question.Options.Where(x => x.SN == opt_sn).FirstOrDefault();
+            var option = await this.GetOptionData(questionId, opt_sn);
             if(option == null)
             {
                 throw new Exception("Option not found!");
@@ -270,7 +262,7 @@ namespace BookManager.API.ServiceProvider
             {
                 throw new Exception("Question not found!");
             }
-            Stream? imageStream = question.ImageUri is null ? null : await _fileStorage.DownloadFile(question.ImageUri);
+            //Stream? imageStream = question.ImageUri is null ? null : await _fileStorage.DownloadFile(question.ImageUri);
             return _mapper.Map<Models.Question>(question);
         }
 
@@ -319,6 +311,96 @@ namespace BookManager.API.ServiceProvider
         public void Dispose()
         {
             _fileStorage.Dispose();
+        }
+
+        public async Task ChangeOption(Guid questionId, short optionsSetSN, int OptSN, Option option)
+        {
+            var original_option = await this.GetOptionData(questionId, optionsSetSN, OptSN);
+            _mapper.Map(option, original_option);
+            //if (option.Image is not null)
+            //{
+            //    await ChangeOptionImage(questionId, OptSN, option.Image);
+            //}
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task ChangeOptionImage(Guid questionId, short optionsSetSN, int opt_sn, Stream image)
+        {
+            var option = await this.GetOptionData(questionId, optionsSetSN, opt_sn);
+            var bookId = await this.GetBookIdOfQuestionId(questionId);
+            string folderName = Path.Combine(bookId.ToString() ?? string.Empty, "Options");
+            string fileName = $"{questionId.ToString()}_{opt_sn}.png";
+            await _fileStorage.UploadFile(fileName, image, folderName);
+            option.ImageUri = Path.Combine(folderName, fileName);
+            _context.SaveChanges();
+        }
+
+        public async Task AddOption(Guid questionId, Option option)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+            {
+                throw new Exception($"Question with id = {questionId} is not found!");
+            }
+            var optionSet = await _context.Options.Where(x => x.QuestionId == question.Id).MaxAsync(x => x.SetNumber);
+            if(optionSet < 1) optionSet = 1;
+            var option_data = _mapper.Map<Data.Models.Option>(option);
+            option_data.SetNumber = optionSet;
+            option_data.QuestionId = question.Id;
+            await _context.Options.AddAsync(option_data);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddOption(Guid questionId, short optionsSetSN, Option option)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question == null)
+            {
+                throw new Exception($"Question with id = {questionId} is not found!");
+            }
+            var option_data = _mapper.Map<Data.Models.Option>(option);
+            option_data.SetNumber = optionsSetSN;
+            option_data.QuestionId = question.Id;
+            await _context.Options.AddAsync(option_data);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<Data.Models.Option> GetOptionData(Guid questionId, int opt_sn)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question is null)
+            {
+                throw new Exception($"Question with id = {questionId} is not found!");
+            }
+            var qsn_options = _context.Options.Where(x => x.QuestionId == question.Id);
+            var number_of_sets = await qsn_options.MaxAsync(x => x.SetNumber);
+            if (number_of_sets > 1) throw new Exception("there are multiple option-set.");
+            var option = await qsn_options.Where(x => x.SN == opt_sn).FirstOrDefaultAsync();
+            if (option is null)
+            {
+                throw new Exception($"Option with sn = {opt_sn} is not found!");
+            }
+            return option;
+        }
+
+        private async Task<Data.Models.Option> GetOptionData(Guid questionId, int opt_set_sn, int opt_sn)
+        {
+            var question = await _context.Questions.FindAsync(questionId);
+            if (question is null)
+            {
+                throw new Exception($"Question with id = {questionId} is not found!");
+            }
+            var qsn_options = _context.Options.Where(x => x.QuestionId == question.Id).Where(x => x.SetNumber == opt_set_sn);
+            if (!await qsn_options.AnyAsync())
+            {
+                throw new Exception("Set doesn't exist!");
+            }
+            var option = await qsn_options.Where(x => x.SN == opt_sn).FirstOrDefaultAsync();
+            if (option is null)
+            {
+                throw new Exception($"Option with sn = {opt_sn} is not found!");
+            }
+            return option;
         }
     }
 }

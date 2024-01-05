@@ -17,6 +17,8 @@ namespace BookManager.API.Data.Models
 
         public bool IsCorrect { get; set; }
 
+        public short SetNumber { get; set; }
+
         [ForeignKey(nameof(Question))]
         [Required]
         public Guid QuestionId { get; set; }
