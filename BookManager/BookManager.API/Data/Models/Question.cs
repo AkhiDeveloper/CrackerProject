@@ -12,7 +12,6 @@ namespace BookManager.API.Data.Models
         public int SN { get; set; }
 
         [Required]
-        [StringLength(80, MinimumLength = 5, ErrorMessage = "Book Name should be between characters of 3 and 80")]
         public string Text { get; set; }
 
         public string? ImageUri { get; set; }

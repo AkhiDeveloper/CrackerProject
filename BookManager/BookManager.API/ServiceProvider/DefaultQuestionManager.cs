@@ -96,8 +96,12 @@ namespace BookManager.API.ServiceProvider
             {
                 throw new Exception($"Question with id = {questionId} is not found!");
             }
-            short setNumber = (short)((await _context.Options.Where(x => x.QuestionId == question.Id).MaxAsync(x => x.SetNumber)) + 1);
-            await _context.SaveChangesAsync();
+            var qsn_opts = _context.Options.Where(x => x.QuestionId == question.Id);
+            short setNumber = 1;
+            if (qsn_opts.Any())
+            {
+                setNumber = (short)(qsn_opts.Max(x => x.SetNumber) + 1);
+            }
             int i = 0;
             foreach(var option in options)
             {
@@ -106,6 +110,7 @@ namespace BookManager.API.ServiceProvider
                 var option_data = _mapper.Map<Data.Models.Option>(option);
                 option_data.QuestionId = questionId;
                 option_data.SetNumber = setNumber;
+                await _context.Options.AddAsync(option_data);
             }
             await _context.SaveChangesAsync();
         }
@@ -147,15 +152,15 @@ namespace BookManager.API.ServiceProvider
             var data_question = _mapper.Map<Data.Models.Question>(question);
             data_question.ParentSetId = set.Id;
             await _context.Questions.AddAsync(data_question);
-            if(question.Image is not null)
+            await _context.SaveChangesAsync();
+            if (question.Image is not null)
             {
                 await ChangeImage(question.Id, question.Image);
             }
-            foreach(var optsSet in question.OptionsSets)
+            foreach (var optsSet in question.OptionsSets)
             {
                 await AddOptionsSet(question.Id, optsSet.Options);
             }
-            await _context.SaveChangesAsync();
         }
 
         public async Task CreateQuestionAtLastSet(Guid chapterId, Models.Question question)

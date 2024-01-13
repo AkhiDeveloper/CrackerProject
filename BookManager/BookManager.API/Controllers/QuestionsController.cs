@@ -117,14 +117,41 @@ namespace BookManager.API.Controllers
 
         [HttpPost("{chapterId}/FromJsonFiles")]
         public async Task<IActionResult> AddQuestionsUsingJsonFile
-            (Guid chapterId, [FromForm] UploadQuestionFromFileRequestBody requestBody)
+            (Guid chapterId, [FromForm] UploadQuestionFromJsonFileRequestBody requestBody)
         {
-            return Ok();
+            try
+            {
+                string[] allowableExtensions = { "txt", "json"};
+                if (allowableExtensions.Contains(Path.GetExtension(requestBody.QuestionJsonFile.FileName)))
+                {
+                    throw new Exception($"Question Json File should be of file type \"{allowableExtensions}\"");
+                }
+                var qsnString = String.Empty;
+                using (var stream = requestBody.QuestionJsonFile.OpenReadStream())
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                    byte[] buffer = new byte[stream.Length];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+                    qsnString = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                }
+                IList<Question> readedQuestions = new List<Question>();
+                var qsnSetNum = (await _questionManager.GetTotalNumberOfSet(chapterId)) + 1;
+                foreach (var question in readedQuestions)
+                {
+                    await _questionManager.CreateQuestion(chapterId, qsnSetNum, question);
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("{chapterId}/FromRawFiles")]
         public async Task<IActionResult> AddQuestionsUsingRawTextFile
-            (Guid chapterId, [FromForm] UploadQuestionFromFileRequestBody requestBody)
+            (Guid chapterId, [FromForm] UploadQuestionFromRawFileRequestBody requestBody)
         {
             try
             {
@@ -158,11 +185,11 @@ namespace BookManager.API.Controllers
                 var isParsed = _qsnTxtConverter.TryParse
                     (qsnString, corrOptString, out IEnumerable<Question> readedQuestions);
                 if (!isParsed) { throw new Exception("Failed To Parse Question and Option Text"); }
-                //var qsnSetNum = (await _questionManager.GetTotalNumberOfSet(chapterId)) + 1;
-                //foreach(var question in readedQuestions)
-                //{
-                //    await _questionManager.CreateQuestion(chapterId, qsnSetNum, question);
-                //}
+                var qsnSetNum = (await _questionManager.GetTotalNumberOfSet(chapterId)) + 1;
+                foreach (var question in readedQuestions)
+                {
+                    await _questionManager.CreateQuestion(chapterId, qsnSetNum, question);
+                }
                 return Ok();
             }
             catch (Exception ex)
