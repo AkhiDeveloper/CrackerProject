@@ -4,6 +4,7 @@ namespace BookManager.API.ServiceProvider
 {
     public interface IQuestionTextConverter
     {
-        bool TryParse(string qsnText, string optText, out IEnumerable<Question> questions);
+        bool TryParseRawText(string qsnText, string optText, out IEnumerable<Question> questions);
+        bool TryParseJsonText(string qsnJson, out IEnumerable<Question> questions);
     }
 }

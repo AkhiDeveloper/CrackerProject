@@ -54,5 +54,16 @@
             var outputString = inputString.Substring(breakIndex, inputString.Count() - breakIndex);
             return outputString;
         }
+
+        public static bool TrySeperateKeyAndValueFromString(this string line, out string key, out string value)
+        {
+            char[] seprators = { '.', ')' };
+            var index = line.IndexOfAny(seprators);
+            key = line.Substring(0, index).TrimSymbolStart().TrimEnd();
+            value = line.Substring(index + 1, line.Length - index - 1).Trim();
+            if (index > 0) return true;
+            return false;
+        }
+
     }
 }

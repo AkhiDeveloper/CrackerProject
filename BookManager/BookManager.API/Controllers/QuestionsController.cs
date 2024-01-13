@@ -121,6 +121,7 @@ namespace BookManager.API.Controllers
         {
             try
             {
+                throw new NotImplementedException();
                 string[] allowableExtensions = { "txt", "json"};
                 if (allowableExtensions.Contains(Path.GetExtension(requestBody.QuestionJsonFile.FileName)))
                 {
@@ -135,7 +136,9 @@ namespace BookManager.API.Controllers
 
                     qsnString = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 }
-                IList<Question> readedQuestions = new List<Question>();
+                var isParsed = _qsnTxtConverter.TryParseJsonText
+                                    (qsnString, out IEnumerable<Question> readedQuestions);
+                if (!isParsed) { throw new Exception("Failed To Parse Question and Option Text"); }
                 var qsnSetNum = (await _questionManager.GetTotalNumberOfSet(chapterId)) + 1;
                 foreach (var question in readedQuestions)
                 {
@@ -182,7 +185,7 @@ namespace BookManager.API.Controllers
 
                     corrOptString = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 }
-                var isParsed = _qsnTxtConverter.TryParse
+                var isParsed = _qsnTxtConverter.TryParseRawText
                     (qsnString, corrOptString, out IEnumerable<Question> readedQuestions);
                 if (!isParsed) { throw new Exception("Failed To Parse Question and Option Text"); }
                 var qsnSetNum = (await _questionManager.GetTotalNumberOfSet(chapterId)) + 1;

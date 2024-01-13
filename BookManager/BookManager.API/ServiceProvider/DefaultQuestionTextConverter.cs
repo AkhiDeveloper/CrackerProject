@@ -1,6 +1,7 @@
 ﻿using BookManager.API.Extension;
 using BookManager.API.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace BookManager.API.ServiceProvider
@@ -8,7 +9,25 @@ namespace BookManager.API.ServiceProvider
     public class DefaultQuestionTextConverter
         : IQuestionTextConverter
     {
-        public bool TryParse(string questionText, string correctOptionText, out IEnumerable<Question> questions)
+        public bool TryParseJsonText(string qsnJson, out IEnumerable<Question> questions)
+        {
+            try
+            {
+                questions = new List<Question>();
+                JArray jArray = JArray.Parse(qsnJson);
+                foreach(JObject jObject in jArray)
+                {
+                    Question question = jObject.ToObject<Question>();
+                }
+                return true;
+            }
+            catch
+            {
+                questions = Enumerable.Empty<Question>();
+                return false;
+            }
+        }
+        public bool TryParseRawText(string questionText, string correctOptionText, out IEnumerable<Question> questions)
         {
             try
             {
@@ -37,7 +56,7 @@ namespace BookManager.API.ServiceProvider
                 {
                     var line = lines[i].Trim();
                     if (string.IsNullOrEmpty(line)) continue;
-                    if (!this.TrySeperateKeyAndValueFromString(line, out string key, out string text)) continue;
+                    if (!line.TrySeperateKeyAndValueFromString(out string key, out string text)) continue;
                     key = key.ToLower();
                     if (int.TryParse(key, out int qsnNum))
                     {
@@ -149,14 +168,5 @@ namespace BookManager.API.ServiceProvider
             
         }
 
-        private bool TrySeperateKeyAndValueFromString(string line, out string key, out string value)
-        {
-            char[] seprators = { '.', ')' };
-            var index = line.IndexOfAny(seprators);
-            key = line.Substring(0, index).TrimSymbolStart().TrimEnd();
-            value = line.Substring(index + 1, line.Length - index - 1).Trim() ;
-            if (index > 0) return true;
-            return false;
-        }
     }
 }
